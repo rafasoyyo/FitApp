@@ -15,6 +15,7 @@ export class Calendar implements OnInit {
   calendarOptions: CalendarOptions = {
     initialView: 'dayGridMonth',
     height: 'auto',
+    themeSystem: 'bootstrap5',
     firstDay: 1,
     weekends: false,
     plugins: [dayGridPlugin, interactionPlugin],
@@ -37,15 +38,11 @@ export class Calendar implements OnInit {
             startTime: hour[0],
             endTime: hour[1],
             startRecur: '2026-01-01',
-            endRecur: '2026-12-31',
+            endRecur: '2026-07-31',
           };
         });
       });
-
-    this.calendarOptions = {
-      ...this.calendarOptions,
-      events: events
-    };
+    this.calendarOptions.events = events;
   }
 
   handleDateClick(arg: any) {
