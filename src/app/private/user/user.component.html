@@ -1,6 +1,19 @@
 <div class="flex justify-center align-items-center flex-column gap-6 mt-6">
+  <h1>FitApp v1.0.1</h1>
+  
+  <div class="flex align-items-center gap-2">
+    <span>Dark Mode</span>
+    <p-toggleSwitch
+      [(ngModel)]="isDarkMode"
+      (onChange)="toggleDarkMode()"
+    />
+  </div>
+
   <p-button
-    label="Toggle Dark Mode"
-    (click)="toggleDarkMode()"
+    styleClass="w-12rem"
+    label="Logout"
+    severity="danger"
+    (click)="logout()"
   />
+
 </div>

@@ -14,7 +14,7 @@
     </p-tab>
     <p-tab
       value="/admin"
-      [routerLink]="['/admin']"
+      [routerLink]="['/admin/agenda']"
     >
       <i class="pi pi-cog mr-2"></i>
     </p-tab>
@@ -23,12 +23,6 @@
       [routerLink]="['/user']"
     >
       <i class="pi pi-user mr-2"></i>
-    </p-tab>
-    <p-tab
-      value="logout"
-      (click)="logout()"
-    >
-      <i class="pi pi-sign-out mr-2"></i>
     </p-tab>
   </p-tablist>
 </p-tabs>

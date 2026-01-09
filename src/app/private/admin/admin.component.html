@@ -1,14 +1,18 @@
-<div class="flex justify-center align-items-center flex-column gap-6 mt-6">
-  <p-button
-    label="Crear usuario"
-    styleClass="w-10rem"
-    size="large"
-    severity="warn"
-  />
-  <p-button
-    label="Crear clase"
-    styleClass="w-10rem"
-    size="large"
-    severity="help"
-  />
-</div>
+<p-tabs [value]="router.url">
+  <p-tablist [pt]="{ tabList: { class: 'justify-content-around' } }">
+    <p-tab
+      value="/agenda"
+      [routerLink]="['/admin/agenda']"
+    >
+      <p class="m-0">Agenda</p>
+    </p-tab>
+    <p-tab
+      value="/users"
+      [routerLink]="['/admin/users']"
+    >
+      <p class="m-0">Usuarios</p>
+    </p-tab>
+  </p-tablist>
+</p-tabs>
+
+<router-outlet></router-outlet>

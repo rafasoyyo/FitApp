@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FullCalendarModule } from '@fullcalendar/angular';
 import { CalendarOptions } from '@fullcalendar/core';
 import dayGridPlugin from '@fullcalendar/daygrid';
@@ -10,17 +10,43 @@ import interactionPlugin from '@fullcalendar/interaction';
   templateUrl: './calendar.component.html',
   styleUrl: './calendar.component.css'
 })
-export class Calendar {
+export class Calendar implements OnInit {
+
   calendarOptions: CalendarOptions = {
     initialView: 'dayGridMonth',
     height: 'auto',
+    firstDay: 1,
+    weekends: false,
     plugins: [dayGridPlugin, interactionPlugin],
     dateClick: (arg) => this.handleDateClick(arg),
-    events: [
-      { title: 'event 1', date: '2025-04-01' },
-      { title: 'event 2', date: '2025-04-02' }
-    ]
   };
+
+  ngOnInit(): void {
+    this.getEvents();
+  }
+
+  getEvents(): void {
+    const days = ['Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes'];
+    const hours = [['18:00:00', '19:15:00'], ['19:15:00', '20:30:00'], ['20:30:00', '21:45:00']];
+    const events = days
+      .flatMap((day, dayIndex) => {
+        return hours.map((hour) => {
+          return {
+            title: day,
+            daysOfWeek: [dayIndex + 1],
+            startTime: hour[0],
+            endTime: hour[1],
+            startRecur: '2026-01-01',
+            endRecur: '2026-12-31',
+          };
+        });
+      });
+
+    this.calendarOptions = {
+      ...this.calendarOptions,
+      events: events
+    };
+  }
 
   handleDateClick(arg: any) {
     alert('date click! ' + arg.dateStr)

@@ -1,12 +1,15 @@
 import { Component } from '@angular/core';
-import { ButtonModule } from 'primeng/button';
+import { Router, RouterLink, RouterOutlet } from '@angular/router';
+
+import { TabsModule } from 'primeng/tabs';
 
 @Component({
   selector: 'app-admin',
-  imports: [ButtonModule],
+  imports: [RouterOutlet, RouterLink, TabsModule],
   templateUrl: './admin.component.html',
   styleUrl: './admin.component.css'
 })
 export class Admin {
 
+  constructor(public router: Router) { }
 }

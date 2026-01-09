@@ -3,12 +3,11 @@ import { RouterOutlet } from '@angular/router';
 import { SwUpdate } from '@angular/service-worker';
 
 import { ConfirmationService } from 'primeng/api';
-import { Button } from 'primeng/button';
 import { ConfirmDialog } from 'primeng/confirmdialog';
 
 @Component({
   selector: 'app-root',
-  imports: [ RouterOutlet, Button, ConfirmDialog ],
+  imports: [RouterOutlet, ConfirmDialog],
   providers: [ SwUpdate, ConfirmationService ],
   templateUrl: './app.html',
   styleUrl: './app.css'
@@ -40,10 +39,5 @@ export class App {
         }
       });
     }
-  }
-
-  toggleDarkMode () {
-    const element = document.querySelector('html');
-    element?.classList.toggle('my-app-dark');
   }
 }

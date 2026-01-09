@@ -13,7 +13,8 @@ export const routes: Routes = [
             {
                 path: 'register',
                 loadComponent: () => import('./public/register/register').then(m => m.Register)
-            }],
+            }
+        ],
     },
     {
         path: '',
@@ -29,12 +30,22 @@ export const routes: Routes = [
                 loadComponent: () => import('./private/list/list').then(m => m.List)
             },
             {
-                path: 'admin',
-                loadComponent: () => import('./private/admin/admin').then(m => m.Admin)
-            },
-            {
                 path: 'user',
                 loadComponent: () => import('./private/user/user').then(m => m.User)
+            },
+            {
+                path: 'admin',
+                loadComponent: () => import('./private/admin/admin').then(m => m.Admin),
+                children: [
+                    {
+                        path: 'agenda',
+                        loadComponent: () => import('./private/admin-agenda/admin-agenda').then(m => m.AdminAgenda)
+                    },
+                    {
+                        path: 'users',
+                        loadComponent: () => import('./private/admin-users/admin-users').then(m => m.AdminUsers)
+                    }
+                ],
             },
         ]
     },
