@@ -1,0 +1,36 @@
+<p-tabs [value]="router.url">
+  <p-tablist [pt]="{ tabList: { class: 'justify-content-around' } }">
+    <p-tab
+      value="/calendar"
+      [routerLink]="['/calendar']"
+    >
+      <i class="pi pi-calendar mr-2"></i>
+    </p-tab>
+    <p-tab
+      value="/list"
+      [routerLink]="['/list']"
+    >
+      <i class="pi pi-list mr-2"></i>
+    </p-tab>
+    <p-tab
+      value="/admin"
+      [routerLink]="['/admin']"
+    >
+      <i class="pi pi-cog mr-2"></i>
+    </p-tab>
+    <p-tab
+      value="/user"
+      [routerLink]="['/user']"
+    >
+      <i class="pi pi-user mr-2"></i>
+    </p-tab>
+    <p-tab
+      value="logout"
+      (click)="logout()"
+    >
+      <i class="pi pi-sign-out mr-2"></i>
+    </p-tab>
+  </p-tablist>
+</p-tabs>
+
+<router-outlet></router-outlet>

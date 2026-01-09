@@ -1,0 +1,28 @@
+<p class="my-0 text-2xl">Entrada</p>
+<hr>
+<div class="flex flex-column my-5 gap-3">
+  <div class="flex flex-column gap-2">
+    <label htmlFor="username">Username</label>
+    <input
+      pInputText
+      id="username"
+      [(ngModel)]="username"
+    />
+  </div>
+  <div class="flex flex-column gap-2">
+    <label htmlFor="password">Password</label>
+    <div>
+      <p-password
+        id="password"
+        [(ngModel)]="password"
+        [feedback]="true"
+        [toggleMask]="true"
+      ></p-password>
+    </div>
+  </div>
+  <p-button
+    label="Login"
+    (onClick)="login()"
+    [style]="{ width: '100%' }"
+  ></p-button>
+</div>

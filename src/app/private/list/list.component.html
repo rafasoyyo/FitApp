@@ -1,0 +1,180 @@
+<div class="mx-2 my-4">
+  <p class="text-3xl font-bold my-3">Próximas clases</p>
+</div>
+
+<p-accordion value="0">
+  <p-accordion-panel value="0">
+    <p-accordion-header class="p-2">
+      <ng-template
+        #toggleicon
+        let-active="active"
+      >
+        @if (active) {
+        <i class="pi pi-minus"></i>
+        } @else {
+        <i class="pi pi-plus"></i>
+        }
+      </ng-template>
+      <span class="flex items-center align-items-center gap-2 w-full">
+        <p-avatar
+          icon="pi pi-check"
+          shape="circle"
+          [pt]="{root: {class: 'bg-green-100'}}"
+        />
+        <span class="text-lg font-bold whitespace-nowrap">Martes 27 Enero -
+          18:00</span>
+        <p-badge
+          value="3 + 3"
+          class="ml-auto mr-2"
+          severity="secondary"
+        />
+      </span>
+    </p-accordion-header>
+    <p-accordion-content>
+      <div>
+        <p class="font-bold my-2 block">Miembros</p>
+        <p-listbox
+          [options]="cities.slice(0, 3)"
+          [(ngModel)]="selectedCity"
+          optionLabel="name"
+          scrollHeight="50vh"
+          class="w-full border-none"
+        />
+      </div>
+      <div class="my-2"></div>
+      <div>
+        <div class="flex justify-content-between align-items-center">
+          <p class="font-bold my-2">Invitados</p>
+          <p-button
+            label="Apuntarme"
+            severity="success"
+            size="small"
+          />
+        </div>
+        <p-listbox
+          [options]="cities.slice(3, 6)"
+          [(ngModel)]="selectedCity"
+          optionLabel="name"
+          scrollHeight="50vh"
+          class="w-full border-none"
+        />
+      </div>
+    </p-accordion-content>
+  </p-accordion-panel>
+  <p-accordion-panel value="1">
+    <p-accordion-header class="p-3">
+      <ng-template
+        #toggleicon
+        let-active="active"
+      >
+        @if (active) {
+        <i class="pi pi-minus"></i>
+        } @else {
+        <i class="pi pi-plus"></i>
+        }
+      </ng-template>
+      <span class="flex items-center align-items-center gap-2 w-full">
+        <p-avatar
+          icon="pi pi-check"
+          shape="circle"
+          [pt]="{root: {class: 'bg-green-100'}}"
+        />
+        <span class="text-lg font-bold whitespace-nowrap">Martes 27 Enero -
+          19:17</span>
+        <p-badge
+          value="7 + 0"
+          class="ml-auto mr-2"
+          severity="secondary"
+        />
+      </span>
+    </p-accordion-header>
+    <p-accordion-content>
+      <div>
+        <p class="font-bold my-2 block">Miembros</p>
+        <p-listbox
+          [options]="cities"
+          [(ngModel)]="selectedCity"
+          optionLabel="name"
+          scrollHeight="50vh"
+          class="w-full border-none"
+        />
+      </div>
+      <div class="my-2"></div>
+      <div>
+        <div class="flex justify-content-between align-items-center">
+          <p class="font-bold my-2">Invitados</p>
+          <p-button
+            label="Apuntarme"
+            severity="success"
+            size="small"
+          />
+        </div>
+        <p-listbox
+          [options]="cities.slice(6, 6)"
+          [(ngModel)]="selectedCity"
+          optionLabel="name"
+          scrollHeight="50vh"
+          class="w-full border-none"
+        />
+      </div>
+    </p-accordion-content>
+  </p-accordion-panel>
+  <p-accordion-panel value="2">
+    <p-accordion-header class="p-3">
+      <ng-template
+        #toggleicon
+        let-active="active"
+      >
+        @if (active) {
+        <i class="pi pi-minus"></i>
+        } @else {
+        <i class="pi pi-plus"></i>
+        }
+      </ng-template>
+      <span class="flex items-center align-items-center gap-2 w-full">
+        <p-avatar
+          icon="pi pi-times"
+          shape="circle"
+          [pt]="{root: {class: 'bg-red-100'}}"
+        />
+        <span class="text-lg font-bold whitespace-nowrap">Martes 27 Enero -
+          20:30</span>
+        <p-badge
+          value="2 + 3"
+          class="ml-auto mr-2"
+          severity="secondary"
+        />
+      </span>
+    </p-accordion-header>
+    <p-accordion-content>
+      <div>
+        <p class="font-bold my-2 block">Miembros</p>
+        <p-listbox
+          [options]="cities.slice(0, 2)"
+          [(ngModel)]="selectedCity"
+          optionLabel="name"
+          scrollHeight="50vh"
+          class="w-full border-none"
+        />
+      </div>
+      <div class="my-2"></div>
+      <div>
+        <div class="flex justify-content-between align-items-center">
+          <p class="font-bold my-2">Invitados</p>
+          <p-button
+            label="Apuntarme"
+            severity="success"
+            size="small"
+          />
+        </div>
+        <p-listbox
+          [options]="cities.slice(4, 7)"
+          [(ngModel)]="selectedCity"
+          optionLabel="name"
+          scrollHeight="50vh"
+          class="w-full border-none"
+        />
+      </div>
+    </p-accordion-content>
+  </p-accordion-panel>
+</p-accordion>
