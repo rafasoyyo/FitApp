@@ -1,11 +1,12 @@
 {
-  "name": "FitApp",
+  "name": "FitCenterApp",
   "short_name": "FitApp",
+  "description": "Fit Center Valencia unofficial App to manage users, classes and agenda",
   "display": "standalone",
   "scope": "./",
-  "start_url": "./",
-  "background_color": "#063749",
-  "theme_color": "#0a4c5e",
+  "start_url": "./agenda",
+  "background_color": "#ffffff",
+  "theme_color": "#ffffff",
   "icons": [
     {
       "src": "icons/icon-72x72.png",
