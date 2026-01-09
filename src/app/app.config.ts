@@ -9,6 +9,7 @@ import { getFirestore, provideFirestore } from '@angular/fire/firestore';
 
 import Material from '@primeng/themes/material';
 import { providePrimeNG } from 'primeng/config';
+import { ConfirmationService } from 'primeng/api';
 
 import { routes } from './app.routes';
 
@@ -39,6 +40,7 @@ export const appConfig: ApplicationConfig = {
         }
       }
     }),
+    ConfirmationService,
     provideServiceWorker('ngsw-worker.js', {
       enabled: !isDevMode(),
       registrationStrategy: 'registerWhenStable:30000'

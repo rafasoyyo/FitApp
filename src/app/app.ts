@@ -1,31 +1,48 @@
-import { Component, signal, inject } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { Button } from 'primeng/button';
 import { SwUpdate } from '@angular/service-worker';
+
+import { Button } from 'primeng/button';
+import { ConfirmDialog } from 'primeng/confirmdialog';
+import { ConfirmationService } from 'primeng/api';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, Button],
+  imports: [ RouterOutlet, Button, ConfirmDialog ],
+  providers: [ SwUpdate, ConfirmationService ],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })
 export class App {
   protected readonly title = signal('FitApp');
-  private readonly swUpdate = inject(SwUpdate);
 
-  constructor () {
+  constructor (
+    private readonly swUpdate: SwUpdate,
+    private readonly confirmationService: ConfirmationService
+  ) {
+    this.triggerUpdateDialog();
+  }
+
+  triggerUpdateDialog () {
     if (this.swUpdate.isEnabled) {
       this.swUpdate.versionUpdates.subscribe((evt) => {
         if (evt.type === 'VERSION_READY') {
-          if (confirm('New version available. Update now?')) {
-            window.location.reload();
-          }
+          this.confirmationService.confirm({
+            message: 'Hay una nueva versión disponible. ¿Deseas actualizar?',
+            header: 'Actualización Disponible',
+            icon: 'pi pi-exclamation-triangle',
+            rejectVisible: false,
+            acceptLabel: 'Actualizar',
+            accept: () => {
+              window.location.reload();
+            }
+          });
         }
       });
     }
   }
 
-  toggleDarkMode() {
+  toggleDarkMode () {
     const element = document.querySelector('html');
     element?.classList.toggle('my-app-dark');
   }
