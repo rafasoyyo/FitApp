@@ -1,3 +1,63 @@
 <div class="mx-2 my-3">
-  <full-calendar [options]="calendarOptions"></full-calendar>
-</div>
+  <full-calendar
+    #calendar
+    [options]="calendarOptions"
+  ></full-calendar>
+  </div>
+  
+  <p-dialog
+    [header]="'Clases del ' + selectedDate()"
+    [visible]="visibleDialog()"
+    (visibleChange)="visibleDialog.set($event)"
+    [modal]="true"
+    [style]="{ width: '90vw', maxWidth: '400px' }"
+    [draggable]="false"
+    [resizable]="false"
+    [dismissableMask]="true"
+  >
+    <div class="flex flex-column gap-3 mt-2">
+      @for (item of selectedClasses(); track item.id) {
+      <div class="p-3 border-round-xl bg-primary-50 border-1 border-primary-100">
+        <div class="flex align-items-center justify-content-between mb-2">
+          <span class="text-primary font-bold text-lg">Sesión de
+            Entrenamiento</span>
+          <span
+            class="bg-primary text-white text-xs font-bold px-2 py-1 border-round-sm"
+          >
+            {{ item.startHour }} - {{ item.endHour }}
+          </span>
+        </div>
+  
+        <div class="flex align-items-center gap-2 text-primary-700 text-sm mb-2">
+          <i class="pi pi-users"></i>
+          <span>{{ item.members.size }} Alumnos Inscritos</span>
+        </div>
+  
+        <div class="flex flex-wrap gap-1 mt-2">
+          @for (name of getMemberNames(item.members); track name) {
+          <span
+            class="bg-primary-100 text-primary-800 px-2 py-1 border-round-md text-xs font-medium"
+          >
+            {{ name }}
+          </span>
+          }
+        </div>
+      </div>
+      } @empty {
+      <div class="text-center p-4 text-600">
+        No hay clases programadas para este día.
+      </div>
+      }
+    </div>
+  
+    <ng-template pTemplate="footer">
+      <div class="flex justify-content-end">
+        <p-button
+          label="Cerrar"
+          [text]="true"
+          severity="secondary"
+          (click)="visibleDialog.set(false)"
+        />
+      </div>
+  </ng-template>
+  </p-dialog>
