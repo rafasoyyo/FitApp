@@ -25,6 +25,9 @@ interface BaseModel {
 export abstract class CrudService<T extends BaseModel> {
   protected firestore = inject(Firestore);
 
+  private listCache = new Map<string, T[]>();
+  private itemCache = new Map<string, T>();
+
   /**
    * The path to the collection in Firestore.
    */
@@ -47,11 +50,19 @@ export abstract class CrudService<T extends BaseModel> {
    * @param constraints Optional Firestore query constraints (where, orderBy, limit, etc.)
    */
   async list(constraints: QueryConstraint[] = []): Promise<T[]> {
+    const cacheKey = this.path + JSON.stringify(constraints);
+    if (this.listCache.has(cacheKey)) {
+      return this.listCache.get(cacheKey)!;
+    }
+
     const q = query(this.collection, ...constraints);
     const querySnapshot = await getDocs(q);
-    return querySnapshot.docs.map(
+    const results = querySnapshot.docs.map(
       (doc) => this.fromJson({ id: doc.id, ...doc.data() }),
     );
+
+    this.listCache.set(cacheKey, results);
+    return results;
   }
 
   /**
@@ -70,10 +81,16 @@ export abstract class CrudService<T extends BaseModel> {
    * @param id The document ID.
    */
   async get(id: string): Promise<T | undefined> {
+    if (this.itemCache.has(id)) {
+      return this.itemCache.get(id);
+    }
+
     const docRef = doc(this.firestore, `${this.path}/${id}`);
     const docSnap = await getDoc(docRef);
     if (docSnap.exists()) {
-      return this.fromJson({ id: docSnap.id, ...docSnap.data() });
+      const result = this.fromJson({ id: docSnap.id, ...docSnap.data() });
+      this.itemCache.set(id, result);
+      return result;
     }
     return undefined;
   }
@@ -93,11 +110,13 @@ export abstract class CrudService<T extends BaseModel> {
    * Creates a new document in the collection.
    * @param item The item to add.
    */
-  create(item: Omit<T, 'id'>): Promise<DocumentReference<T>> {
+  async create(item: Omit<T, 'id'>): Promise<DocumentReference<T>> {
     const data = (item as any).toJson ? (item as any).toJson() : item;
     // We remove the 'id' field if it exists to let Firestore generate one
     const { id, ...cleanData } = data;
-    return addDoc(this.collection, cleanData);
+    const docRef = await addDoc(this.collection, cleanData);
+    this.listCache.clear();
+    return docRef as DocumentReference<T>;
   }
 
   /**
@@ -105,19 +124,23 @@ export abstract class CrudService<T extends BaseModel> {
    * @param id The document ID.
    * @param item The partial data to update.
    */
-  update(id: string, item: Partial<T>): Promise<void> {
+  async update(id: string, item: Partial<T>): Promise<void> {
     const docRef = doc(this.firestore, `${this.path}/${id}`);
     const data = (item as any).toJson ? (item as any).toJson() : item;
     const { id: _, ...cleanData } = data;
-    return updateDoc(docRef, cleanData);
+    await updateDoc(docRef, cleanData);
+    this.itemCache.delete(id);
+    this.listCache.clear();
   }
 
   /**
    * Deletes a document by ID.
    * @param id The document ID.
    */
-  delete(id: string): Promise<void> {
+  async delete(id: string): Promise<void> {
     const docRef = doc(this.firestore, `${this.path}/${id}`);
-    return deleteDoc(docRef);
+    await deleteDoc(docRef);
+    this.itemCache.delete(id);
+    this.listCache.clear();
   }
 }
