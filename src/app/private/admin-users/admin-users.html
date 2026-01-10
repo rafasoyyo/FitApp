@@ -25,33 +25,32 @@
       pTemplate="item"
       let-user
     >
-      <div
-        class="user-card shadow-2 flex align-items-center gap-4 p-3 w-full border-round-xl bg-white mb-2"
-      >
-        <div
-          class="w-3rem h-3rem border-circle flex align-items-center justify-content-center font-bold flex-shrink-0 text-xl"
-          [style]="{backgroundColor: user.bgColor, color: user.color}"
-        >
-          {{ user.capitalLetter }}
-        </div>
-        <!-- User Avatar & Info -->
-        <div class="flex flex-column gap-2 flex-grow-1">
+      <p-card [pt]="{ root: { class: 'w-full' }, body: { class: 'p-3' } }">
+        <div class="flex align-items-center gap-4 w-full">
+          <div
+            class="w-3rem h-3rem border-circle flex align-items-center justify-content-center font-bold flex-shrink-0 text-xl"
+            [style]="{backgroundColor: user.bgColor, color: user.color}"
+          >
+            {{ user.capitalLetter }}
+          </div>
+          <!-- User Avatar & Info -->
+          <div class="flex flex-column gap-2 flex-grow-1">
+            <div class="flex flex-row justify-content-between">
+              <span class="font-bold text-lg line-height-2 truncate">
+                {{ user.name }}
+              </span>
 
-          <div class="flex flex-row flex-row justify-content-between">
-            <span class="font-bold text-lg line-height-2 truncate">{{
-              user.name }}</span>
+              <div class="flex align-items-center gap-2">
+                <span class="text-sm text-500">Verificado:</span>
+                <p-toggleSwitch
+                  [ngModel]="user.verified"
+                  (onChange)="toggleVerified(user, $event.checked)"
+                  (click)="$event.stopPropagation()"
+                  styleClass="custom-switch"
+                />
+              </div>
+            </div>
 
-            <div class="flex align-items-center gap-2">
-              <span class="text-sm text-500">Verificado:</span>
-              <p-toggleSwitch
-                [ngModel]="user.verified"
-                (onChange)="toggleVerified(user, $event.checked)"
-                (click)="$event.stopPropagation()"
-                styleClass="custom-switch"
-              />
-            </div>
-            </div>
-            
             <div class="flex flex-column align-items-start gap-1 text-600 text-sm">
               <span class="flex align-items-center gap-1">
                 <i class="pi pi-envelope text-xs"></i>
@@ -62,8 +61,9 @@
                 {{ user.phone }}
               </span>
             </div>
-            </div>
-            </div>
+          </div>
+          </div>
+      </p-card>
             </ng-template>
             <ng-template pTemplate="empty">
               <div class="flex flex-column align-items-center gap-3 p-8">

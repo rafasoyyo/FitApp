@@ -1,21 +1,64 @@
-import { Component } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { Component, OnInit, signal } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 
-import { FormsModule } from '@angular/forms';
-import { Button } from 'primeng/button';
-import { ToggleSwitch } from 'primeng/toggleswitch';
+import { ButtonModule } from 'primeng/button';
+import { FloatLabelModule } from 'primeng/floatlabel';
+import { InputTextModule } from 'primeng/inputtext';
+import { MessageModule } from 'primeng/message';
+import { ToggleSwitchModule } from 'primeng/toggleswitch';
+
+import { User as UserDomain } from '../../domain/user/user';
+import { UserService } from '../../domain/user/user.service';
 
 @Component({
   selector: 'app-user',
-  imports: [Button, ToggleSwitch, FormsModule],
+  standalone: true,
+  imports: [
+    CommonModule,
+    FormsModule,
+    ButtonModule,
+    ToggleSwitchModule,
+    InputTextModule,
+    FloatLabelModule,
+    MessageModule
+  ],
   templateUrl: './user.component.html',
   styleUrl: './user.component.css'
 })
-export class User {
-  isDarkMode: boolean = false;
+export class User implements OnInit {
 
-  constructor(public router: Router) {
+  loggedUser = signal<UserDomain>({} as UserDomain);
+  isDarkMode = false;
+  loading = signal(false);
+
+  constructor(
+    private userService: UserService,
+    private router: Router
+  ) {
     this.isDarkMode = document.querySelector('html')?.classList.contains('my-app-dark') ?? false;
+  }
+
+  ngOnInit(): void {
+    this.userService.getLoggedUser()
+      .then(user => this.loggedUser.set(user as UserDomain));
+  }
+
+  async saveProfile() {
+    this.loading.set(true);
+    try {
+      await this.userService.update(this.loggedUser().id, {
+        name: this.loggedUser().name,
+        phone: this.loggedUser().phone,
+        darkMode: this.isDarkMode
+      });
+      // Optional: show some success toast if you have it
+    } catch (error) {
+      console.error('Error updating profile:', error);
+    } finally {
+      this.loading.set(false);
+    }
   }
 
   logout() {
@@ -25,5 +68,4 @@ export class User {
   toggleDarkMode() {
     document.querySelector('html')?.classList.toggle('my-app-dark', this.isDarkMode);
   }
-
 }

@@ -2,6 +2,7 @@ import { colorCombinations } from "./userUtils";
 
 type UserType = {
   id: string;
+  darkMode: boolean;
   email: string;
   name: string;
   phone: string;
@@ -15,6 +16,7 @@ export class User {
     private _id: string,
     private _bgColor: string,
     private _color: string,
+    private _darkMode: boolean,
     private _email: string,
     private _name: string,
     private _phone: string,
@@ -32,6 +34,10 @@ export class User {
 
   get color(): string {
     return this._color;
+  }
+
+  get darkMode(): boolean {
+    return this._darkMode;
   }
 
   get email(): string {
@@ -67,6 +73,7 @@ export class User {
       json.id,
       bgColor,
       color,
+      json.darkMode,
       json.email,
       json.name,
       json.phone,
@@ -78,6 +85,7 @@ export class User {
   toJson(): any {
     return {
       id: this.id,
+      darkMode: this.darkMode,
       name: this.name,
       email: this.email,
       phone: this.phone,

@@ -3,6 +3,7 @@ import { ChangeDetectionStrategy, Component, OnInit, signal } from '@angular/cor
 import { FormsModule } from '@angular/forms';
 
 import { ButtonModule } from 'primeng/button';
+import { CardModule } from 'primeng/card';
 import { ListboxModule } from 'primeng/listbox';
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
 
@@ -17,7 +18,8 @@ import { UserService } from '../../domain/user/user.service';
     FormsModule,
     ButtonModule,
     ListboxModule,
-    ToggleSwitchModule
+    ToggleSwitchModule,
+    CardModule
   ],
   templateUrl: './admin-users.html',
   styleUrl: './admin-users.css',
