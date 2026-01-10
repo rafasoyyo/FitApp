@@ -1,4 +1,4 @@
-import { Component, signal } from '@angular/core';
+import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { SwUpdate } from '@angular/service-worker';
 
@@ -13,8 +13,6 @@ import { ConfirmDialog } from 'primeng/confirmdialog';
   styleUrl: './app.css'
 })
 export class App {
-  protected readonly title = signal('FitApp');
-
   constructor (
     private readonly swUpdate: SwUpdate,
     private readonly confirmationService: ConfirmationService
