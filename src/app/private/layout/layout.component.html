@@ -2,8 +2,8 @@
   <p-tablist [pt]="{ tabList: { class: 'justify-content-around' } }">
     <p-tab
       value="/home"
-      disabled="true"
-      [pt]="{ root: { class: 'pl-2 pr-0' } }"
+      [pt]="{ root: { class: 'pl-2 pr-0 text-500' } }"
+      (click)="showAbout.set(true)"
     >
       <p class="m-0">FitCenter</p>
     </p-tab>
@@ -35,3 +35,36 @@
 </p-tabs>
 
 <router-outlet></router-outlet>
+
+<p-dialog
+  [visible]="showAbout()"
+  (visibleChange)="showAbout.set($event)"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [dismissableMask]="true"
+  [closable]="true"
+  [closeOnEscape]="true"
+  [style]="{ width: '20rem' }"
+  [pt]="{headerActions: {class: 'hidden'}}"
+>
+  <div class="flex flex-column align-items-center gap-4 py-4">
+    <div
+      class="w-5rem h-5rem border-circle bg-primary-50 flex align-items-center justify-content-center"
+    >
+      <img
+        src="./icons/icon-512x512.png"
+        alt="FitCenter"
+        class="w-full"
+      />
+    </div>
+    <div class="text-center">
+      <h2 class="m-0 font-bold text-2xl text-900 line-height-1">FitCenter</h2>
+      <p class="text-600 mt-2 font-medium">Versión {{ version() }}</p>
+    </div>
+    <div class="w-full pt-3 text-center">
+      <p class="text-500 text-sm m-0">App no oficial de FitCenter para la
+        coordinacion de las clases y los alumnos.</p>
+    </div>
+  </div>
+</p-dialog>
