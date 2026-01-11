@@ -1,15 +1,20 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, signal, ViewChild } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { FullCalendarComponent, FullCalendarModule } from '@fullcalendar/angular';
 import { CalendarOptions } from '@fullcalendar/core';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
+
 import { MenuItem } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
+import { CheckboxModule } from 'primeng/checkbox';
 import { DialogModule } from 'primeng/dialog';
 import { SplitButtonModule } from 'primeng/splitbutton';
 
+import { ListboxModule } from 'primeng/listbox';
 import { AgendaService } from '../../domain/agenda/agenda.service';
+import { Lesson } from '../../domain/lesson/lesson';
 import { LessonService } from '../../domain/lesson/lesson.service';
 import { User } from '../../domain/user/user';
 import { UserService } from '../../domain/user/user.service';
@@ -17,7 +22,7 @@ import { UserService } from '../../domain/user/user.service';
 @Component({
   selector: 'app-calendar',
   standalone: true,
-  imports: [CommonModule, FullCalendarModule, DialogModule, ButtonModule, SplitButtonModule],
+  imports: [CommonModule, FormsModule, FullCalendarModule, DialogModule, ButtonModule, CheckboxModule, ListboxModule, SplitButtonModule],
   templateUrl: './calendar.component.html',
   styleUrl: './calendar.component.css'
 })
@@ -26,9 +31,11 @@ export class Calendar implements OnInit {
 
   currentDate = signal<any>(null);
   visibleDialog = signal(false);
-  selectedClasses = signal<any[]>([]);
+  visibleEditDialog = signal(false);
+  selectedClass = signal<any[]>([]);
   selectedDate = signal<string>('');
   users = signal<User[]>([]);
+  selectedMembers = signal<User[]>([]);
 
   calendarOptions: CalendarOptions = {
     initialView: 'dayGridMonth',
@@ -163,22 +170,23 @@ export class Calendar implements OnInit {
 
     const displayItem = {
       agendaId: agenda.id,
-      lessonId: lesson?.id,
+      id: lesson?.id,
       date: date,
       status: expired ? 'finished' : lesson?.status || 'planned',
-      lessonName: lesson?.name || 'Clase',
+      name: lesson?.name || 'Clase',
       startHour: agenda.startHour,
       endHour: agenda.endHour,
       members: agenda.members
     };
 
-    this.selectedClasses.set([displayItem]);
+    this.selectedClass.set([displayItem]);
     this.visibleDialog.set(true);
   }
 
   getStatusLabel(status: string) {
     if (status === 'active') return 'Activada';
     if (status === 'canceled') return 'Cancelada';
+    if (status === 'finished') return 'Finalizada';
     return 'Planeada';
   }
 
@@ -188,50 +196,45 @@ export class Calendar implements OnInit {
     return 'pi pi-clock';
   }
 
+  onMembersChange(event: any) {
+    this.selectedMembers.set(event.value);
+  }
+
   getStatusMenuItems(item: any): MenuItem[] {
     return [
       {
         label: 'Activar',
         icon: 'pi pi-check',
         visible: item.status !== 'active',
-        command: () => this.updateLessonStatus(item, 'active')
+        command: () => item.status = 'active'
       },
       {
         label: 'Planear',
         icon: 'pi pi-clock',
         visible: item.status !== 'planned',
-        command: () => this.updateLessonStatus(item, 'planned')
+        command: () => item.status = 'planned'
       },
       {
         label: 'Cancelar',
         icon: 'pi pi-times',
         visible: item.status !== 'canceled',
-        command: () => this.updateLessonStatus(item, 'canceled')
+        command: () => item.status = 'canceled'
       }
     ];
   }
 
-  async updateLessonStatus(item: any, newStatus: 'planned' | 'canceled' | 'active') {
+  async updateLessonStatus() {
+    const membersIds = this.selectedMembers().map(u => u.id);
+    const input = this.selectedClass()[0];
+    const lesson = Lesson.fromJson({ ...input, guest: new Set(membersIds) });
+    if (!lesson) return;
     try {
-      let lesson;
-      if (item.lessonId) {
-        lesson = await this.lessonService.update(item.lessonId, { status: newStatus } as any);
-      } else {
-        const newLesson = {
-          agendaId: item.agendaId,
-          date: item.date,
-          status: newStatus,
-          name: item.lessonName,
-          note: '',
-          assistant: [],
-          absents: [],
-          guest: []
-        } as any;
-        lesson = await this.lessonService.create(newLesson);
-      }
+      input.id
+        ? await this.lessonService.update(input.id, lesson)
+        : await this.lessonService.create(lesson);
 
       this.calendarComponent.getApi().refetchEvents();
-      this.visibleDialog.set(false);
+      this.visibleEditDialog.set(false);
     } catch (error) {
       console.error('Error updating lesson status:', error);
     }

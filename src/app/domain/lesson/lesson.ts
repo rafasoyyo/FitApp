@@ -68,11 +68,11 @@ export class Lesson {
   }
 
   get name(): string {
-    return this._name;
+    return this._name || '';
   }
 
   get note(): string {
-    return this._note;
+    return this._note || '';
   }
 
   get status(): 'planned' | 'canceled' | 'active' | 'finished' {
