@@ -25,7 +25,7 @@
     [options]="agendaItems()"
     dataKey="id"
     [filter]="true"
-    filterBy="day,startHour"
+    filterBy="day,startHour,memberNames"
     [style]="{ width: '100%' }"
     [listStyle]="{ 'max-height': 'calc(100vh - 350px)' }"
     styleClass="border-none"
@@ -51,41 +51,38 @@
                 <span class="text-600 text-sm">
                   {{ item.startHour }} - {{ item.endHour }}
                 </span>
-<!-- Members Tags -->
-<div class="flex flex-wrap gap-1 mt-2">
-  @for (name of getMemberNames(item.members); track name) {
-  <span
-    class="px-2 py-1 bg-blue-50 text-blue-700 border-round text-xs font-medium"
-  >
-    {{ name }}
-  </span>
-  }
-</div>
               </div>
 
               <div class="flex align-items-center gap-3">
-                <div class="flex flex-column align-items-center">
-                  <span class="text-xl font-bold text-primary">{{
-                    item.members.size }}</span>
-                  <span class="text-xs text-500 uppercase">Alumnos</span>
-                </div>
-
                 <p-button
                   icon="pi pi-users"
+                  [label]="item.members.size"
                   [rounded]="true"
-                  [text]="true"
+                  variant="outlined"
                   severity="info"
+                  size="small"
                   (click)="openManageMembers(item); $event.stopPropagation()"
                 />
 
                 <p-button
                   icon="pi pi-trash"
                   [rounded]="true"
-                  [text]="true"
+                  variant="outlined"
                   severity="danger"
+                  size="small"
                   (click)="deleteAgenda(item); $event.stopPropagation()"
                 />
               </div>
+            </div>
+            <!-- Members Tags -->
+            <div class="flex flex-wrap gap-1 mt-2">
+              @for (name of item.memberNames; track name) {
+              <span
+                class="px-2 py-1 bg-blue-50 text-blue-700 border-round text-xs font-medium"
+              >
+                {{ name }}
+              </span>
+              }
             </div>
           </div>
         </div>
@@ -202,13 +199,11 @@
             for="startDay"
             class="font-bold text-xs text-500"
           >Desde</label>
-          <p-datepicker
+          <input pInputText
             id="startDay"
+            type="date"
             [(ngModel)]="newItem.startDay"
-            dateFormat="dd/mm/yy"
-            placeholder="Inicio"
-            fluid
-            appendTo="body"
+            class="w-full"
           />
         </div>
 
@@ -218,13 +213,11 @@
             for="endDay"
             class="font-bold text-xs text-500"
           >Hasta</label>
-          <p-datepicker
+          <input pInputText
             id="endDay"
+            type="date"
             [(ngModel)]="newItem.endDay"
-            dateFormat="dd/mm/yy"
-            placeholder="Fin"
-            fluid
-            appendTo="body"
+            class="w-full"
           />
         </div>
       </div>
@@ -236,13 +229,11 @@
             for="startHour"
             class="font-bold text-xs text-500"
           >Hora Inicio</label>
-          <p-datepicker
+          <input pInputText
             id="startHour"
+            type="time"
             [(ngModel)]="newItem.startHour"
-            [timeOnly]="true"
-            placeholder="00:00"
-            fluid
-            appendTo="body"
+            class="w-full"
           />
         </div>
 
@@ -252,28 +243,26 @@
             for="endHour"
             class="font-bold text-xs text-500"
           >Hora Fin</label>
-          <p-datepicker
+          <input pInputText
             id="endHour"
+            type="time"
             [(ngModel)]="newItem.endHour"
-            [timeOnly]="true"
-            placeholder="00:00"
-            fluid
-            appendTo="body"
+            class="w-full"
           />
         </div>
       </div>
-      </div>
+    </div>
 
-      <ng-template pTemplate="footer">
-        <div class="flex justify-content-end gap-2 pt-2">
-          <p-button
-            label="Cancelar"
-            severity="secondary"
-            [text]="true"
-            size="small"
-            (click)="showAddDialog.set(false)"
-          />
-          <p-button
+    <ng-template pTemplate="footer">
+      <div class="flex justify-content-end gap-2 pt-2">
+        <p-button
+          label="Cancelar"
+          severity="secondary"
+          [text]="true"
+          size="small"
+          (click)="showAddDialog.set(false)"
+        />
+        <p-button
           label="Crear"
           severity="help"
           size="small"
@@ -282,5 +271,5 @@
         />
       </div>
     </ng-template>
-    </p-dialog>
-    </div>
+  </p-dialog>
+</div>

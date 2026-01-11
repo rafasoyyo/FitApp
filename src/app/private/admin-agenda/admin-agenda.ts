@@ -6,7 +6,6 @@ import { ConfirmationService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
-import { DatePickerModule } from 'primeng/datepicker';
 import { DialogModule } from 'primeng/dialog';
 import { InputTextModule } from 'primeng/inputtext';
 import { ListboxModule } from 'primeng/listbox';
@@ -17,6 +16,8 @@ import { Agenda } from '../../domain/agenda/agenda';
 import { AgendaService } from '../../domain/agenda/agenda.service';
 import { User } from '../../domain/user/user';
 import { UserService } from '../../domain/user/user.service';
+
+type AgendaWithMembers = Agenda & { memberNames: string[] };
 
 @Component({
   selector: 'app-admin-agenda',
@@ -31,7 +32,6 @@ import { UserService } from '../../domain/user/user.service';
     DialogModule,
     SelectModule,
     InputTextModule,
-    DatePickerModule,
     MultiSelectModule
   ],
   providers: [ConfirmationService],
@@ -40,7 +40,7 @@ import { UserService } from '../../domain/user/user.service';
   changeDetection: ChangeDetectionStrategy.Default,
 })
 export class AdminAgenda implements OnInit {
-  agendaItems = signal<Agenda[]>([]);
+  agendaItems = signal<AgendaWithMembers[]>([]);
   users = signal<User[]>([]);
   showAddDialog = signal(false);
   showMembersDialog = signal(false);
@@ -69,9 +69,9 @@ export class AdminAgenda implements OnInit {
     private confirmationService: ConfirmationService
   ) { }
 
-  ngOnInit(): void {
-    this.getAgendaList();
-    this.getUserList();
+  async ngOnInit(): Promise<void> {
+    await this.getUserList();
+    await this.getAgendaList();
   }
 
   getMemberNames(memberIds: Set<string> | string[]): string[] {
@@ -87,7 +87,7 @@ export class AdminAgenda implements OnInit {
     });
   }
 
-  getAgendaList(): Promise<Agenda[]> {
+  getAgendaList(): Promise<AgendaWithMembers[]> {
     return this.agendaService.list()
       .then(items => {
         // Sort by day and then by hour
@@ -97,7 +97,8 @@ export class AdminAgenda implements OnInit {
             return dayOrder[a.day] - dayOrder[b.day];
           }
           return a.startHour.localeCompare(b.startHour);
-        });
+        }) as AgendaWithMembers[];
+        sortedItems.forEach(item => item.memberNames = this.getMemberNames(item.members));
         this.agendaItems.set(sortedItems);
         return sortedItems;
       });
@@ -117,25 +118,12 @@ export class AdminAgenda implements OnInit {
   saveAgenda() {
     if (!this.newItem.startHour || !this.newItem.endHour || !this.newItem.startDay || !this.newItem.endDay) return;
 
-    const formatTime = (date: Date) => {
-      const hours = date.getHours().toString().padStart(2, '0');
-      const minutes = date.getMinutes().toString().padStart(2, '0');
-      return `${hours}:${minutes}`;
-    };
-
-    const formatDate = (date: Date) => {
-      const year = date.getFullYear();
-      const month = (date.getMonth() + 1).toString().padStart(2, '0');
-      const day = date.getDate().toString().padStart(2, '0');
-      return `${year}-${month}-${day}`;
-    };
-
     const data = {
       day: this.newItem.day,
-      startDay: formatDate(this.newItem.startDay),
-      endDay: formatDate(this.newItem.endDay),
-      startHour: formatTime(this.newItem.startHour),
-      endHour: formatTime(this.newItem.endHour),
+      startDay: this.newItem.startDay,
+      endDay: this.newItem.endDay,
+      startHour: this.newItem.startHour,
+      endHour: this.newItem.endHour,
       members: []
     } as any;
 
