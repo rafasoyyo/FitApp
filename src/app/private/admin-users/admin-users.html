@@ -61,6 +61,18 @@
                 {{ user.phone }}
               </span>
             </div>
+<!-- User Agendas Tags -->
+<div class="flex flex-wrap gap-1 mt-2">
+  @for (agenda of getUserAgendas(user.id); track agenda.id) {
+  <span
+    class="px-2 py-1 bg-purple-50 text-purple-700 border-round text-xs font-medium capitalize"
+  >
+    {{ agenda.day }} {{ agenda.startHour }}
+  </span>
+  } @empty {
+  <span class="text-xs text-400 italic">Sin clases asignadas</span>
+  }
+</div>
           </div>
           </div>
       </p-card>

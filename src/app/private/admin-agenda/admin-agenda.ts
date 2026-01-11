@@ -74,6 +74,13 @@ export class AdminAgenda implements OnInit {
     this.getUserList();
   }
 
+  getMemberNames(memberIds: Set<string> | string[]): string[] {
+    const ids = Array.from(memberIds);
+    return this.users()
+      .filter(u => ids.includes(u.id))
+      .map(u => u.name);
+  }
+
   getUserList() {
     this.userService.list().then(users => {
       this.users.set(users);

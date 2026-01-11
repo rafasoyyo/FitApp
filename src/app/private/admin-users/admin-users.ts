@@ -7,6 +7,8 @@ import { CardModule } from 'primeng/card';
 import { ListboxModule } from 'primeng/listbox';
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
 
+import { Agenda } from '../../domain/agenda/agenda';
+import { AgendaService } from '../../domain/agenda/agenda.service';
 import { User } from '../../domain/user/user';
 import { UserService } from '../../domain/user/user.service';
 
@@ -28,12 +30,17 @@ import { UserService } from '../../domain/user/user.service';
 export class AdminUsers implements OnInit {
 
   users = signal<User[]>([]);
+  agendas = signal<Agenda[]>([]);
 
-  constructor(private userService: UserService) {
+  constructor(
+    private userService: UserService,
+    private agendaService: AgendaService
+  ) {
   }
 
   ngOnInit(): void {
     this.getUserList();
+    this.getAgendaList();
   }
 
   getUserList(): Promise<User[]> {
@@ -42,6 +49,16 @@ export class AdminUsers implements OnInit {
         this.users.set(users);
         return users;
       });
+  }
+
+  getAgendaList() {
+    this.agendaService.list().then(agendas => {
+      this.agendas.set(agendas);
+    });
+  }
+
+  getUserAgendas(userId: string): Agenda[] {
+    return this.agendas().filter(a => a.members.has(userId));
   }
 
   toggleVerified(user: User, newStatus: boolean) {
