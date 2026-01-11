@@ -33,7 +33,6 @@ export class Calendar implements OnInit {
   calendarOptions: CalendarOptions = {
     initialView: 'dayGridMonth',
     height: 'auto',
-    // themeSystem: 'bootstrap5',
     firstDay: 1,
     weekends: false,
     plugins: [dayGridPlugin, interactionPlugin],
@@ -74,6 +73,11 @@ export class Calendar implements OnInit {
     return this.users()
       .filter(u => ids.includes(u.id))
       .map(u => u.name);
+  }
+
+  getMembers(memberIds: Set<string> | string[]): User[] {
+    const ids = Array.from(memberIds);
+    return this.users().filter(u => ids.includes(u.id));
   }
 
   async loadLessonsEvents(info: any, successCallback: any, failureCallback: any): Promise<void> {
@@ -165,7 +169,7 @@ export class Calendar implements OnInit {
       lessonName: lesson?.name || 'Clase',
       startHour: agenda.startHour,
       endHour: agenda.endHour,
-      members: lesson ? lesson.assistant : agenda.members
+      members: agenda.members
     };
 
     this.selectedClasses.set([displayItem]);
@@ -219,6 +223,9 @@ export class Calendar implements OnInit {
           status: newStatus,
           name: item.lessonName,
           note: '',
+          assistant: [],
+          absents: [],
+          guest: []
         } as any;
         lesson = await this.lessonService.create(newLesson);
       }

@@ -109,19 +109,33 @@
         ></p-splitbutton>
       </div>
 
-      <div class="flex flex-wrap gap-1 mt-2">
-        @for (name of getMemberNames(item.members); track name) {
-        <span
-          class="px-2 py-1 border-round-md text-xs font-medium"
-          [ngClass]="{
-            'bg-green-100 text-green-800': item.status === 'active',
-            'bg-yellow-100 text-yellow-800': item.status === 'planned',
-            'bg-red-100 text-red-800': item.status === 'canceled'
-          }"
-        >
-          {{ name }}
-        </span>
-        }
+      <!-- Lista de Alumnos -->
+      <div class="flex flex-column gap-2 mt-2">
+        <span class="text-xs font-bold uppercase text-500">Alumnos Inscritos</span>
+        <div class="flex flex-wrap gap-2">
+          @for (user of getMembers(item.members); track user.id) {
+          <div
+            class="flex align-items-center gap-2 px-2 py-1 border-round-lg border-1"
+            [ngClass]="{
+                'bg-green-100 border-green-200 text-green-900': item.status === 'active',
+                'bg-yellow-100 border-yellow-200 text-yellow-900': item.status === 'planned',
+                'bg-red-100 border-red-200 text-red-900': item.status === 'canceled',
+                'bg-gray-100 border-gray-200 text-gray-900': item.status === 'finished'
+              }"
+            >
+              <div
+                class="w-1rem h-1rem border-circle flex align-items-center justify-content-center font-bold text-xs"
+                [style.backgroundColor]="user.bgColor"
+                [style.color]="user.color"
+              >
+                {{ user.capitalLetter }}
+              </div>
+              <span class="text-xs font-semibold">{{ user.name }}</span>
+              </div>
+              } @empty {
+              <span class="text-xs text-400 italic">No hay alumnos inscritos</span>
+              }
+        </div>
       </div>
     </div>
     } @empty {
