@@ -3,61 +3,142 @@
     #calendar
     [options]="calendarOptions"
   ></full-calendar>
+<!-- Legend -->
+<div
+  class="flex flex-wrap gap-4 justify-content-center mt-3 text-xs font-medium text-600"
+>
+  <div class="flex align-items-center gap-2">
+    <div
+      class="w-1rem h-1rem border-round shadow-1"
+      style="background-color: #22c55e"
+    ></div>
+    <span>Activa</span>
   </div>
-  
-  <p-dialog
-    [header]="'Clases del ' + selectedDate()"
-    [visible]="visibleDialog()"
-    (visibleChange)="visibleDialog.set($event)"
-    [modal]="true"
-    [style]="{ width: '90vw', maxWidth: '400px' }"
-    [draggable]="false"
-    [resizable]="false"
-    [dismissableMask]="true"
-  >
-    <div class="flex flex-column gap-3 mt-2">
-      @for (item of selectedClasses(); track item.id) {
-      <div class="p-3 border-round-xl bg-primary-50 border-1 border-primary-100">
-        <div class="flex align-items-center justify-content-between mb-2">
-          <span class="text-primary font-bold text-lg">Sesión de
-            Entrenamiento</span>
-          <span
-            class="bg-primary text-white text-xs font-bold px-2 py-1 border-round-sm"
-          >
-            {{ item.startHour }} - {{ item.endHour }}
-          </span>
-        </div>
-  
-        <div class="flex align-items-center gap-2 text-primary-700 text-sm mb-2">
-          <i class="pi pi-users"></i>
-          <span>{{ item.members.size }} Alumnos Inscritos</span>
-        </div>
-  
-        <div class="flex flex-wrap gap-1 mt-2">
-          @for (name of getMemberNames(item.members); track name) {
-          <span
-            class="bg-primary-100 text-primary-800 px-2 py-1 border-round-md text-xs font-medium"
-          >
-            {{ name }}
-          </span>
-          }
-        </div>
+  <div class="flex align-items-center gap-2">
+    <div
+      class="w-1rem h-1rem border-round shadow-1"
+      style="background-color: #facc15"
+    ></div>
+    <span>Planeada</span>
+  </div>
+  <div class="flex align-items-center gap-2">
+    <div
+      class="w-1rem h-1rem border-round shadow-1"
+      style="background-color: #ef4444"
+    ></div>
+    <span>Cancelada</span>
+  </div>
+  <div class="flex align-items-center gap-2">
+    <div
+      class="w-1rem h-1rem border-round shadow-1"
+      style="background-color: #b1b1b1ff"
+    ></div>
+    <span>Finalizada</span>
+  </div>
+</div>
+</div>
+
+<p-dialog
+  [header]="'Clases del ' + selectedDate()"
+  [visible]="visibleDialog()"
+  (visibleChange)="visibleDialog.set($event)"
+  [modal]="true"
+  [style]="{ width: '90vw', maxWidth: '400px' }"
+  [draggable]="false"
+  [resizable]="false"
+  [dismissableMask]="true"
+>
+  <div class="flex flex-column gap-3 mt-2">
+    @for (item of selectedClasses(); track item.agendaId) {
+    <div
+      class="p-3 border-round-xl border-1"
+      [ngClass]="{
+        'bg-green-50 border-green-100': item.status === 'active',
+        'bg-yellow-50 border-yellow-100': item.status === 'planned',
+        'bg-red-50 border-red-100': item.status === 'canceled'
+      }"
+    >
+      <div class="flex align-items-center justify-content-between mb-2">
+        <span
+          class="font-bold text-lg"
+          [ngClass]="{
+            'text-green-700': item.status === 'active',
+            'text-yellow-700': item.status === 'planned',
+            'text-red-700': item.status === 'canceled'
+          }"
+        >
+          {{ item.lessonName }}
+        </span>
+        <span
+          class="text-white text-xs font-bold px-2 py-1 border-round-sm"
+          [ngClass]="{
+            'bg-green-500': item.status === 'active',
+            'bg-yellow-500': item.status === 'planned',
+            'bg-red-500': item.status === 'canceled',
+            'bg-gray-500': item.status === 'finished'
+          }"
+        >
+          {{ item.startHour }} - {{ item.endHour }}
+        </span>
       </div>
-      } @empty {
-      <div class="text-center p-4 text-600">
-        No hay clases programadas para este día.
+
+      <div
+        class="flex align-items-center gap-2 text-sm mb-3"
+        [ngClass]="{
+          'text-green-600': item.status === 'active',
+          'text-yellow-600': item.status === 'planned',
+          'text-red-600': item.status === 'canceled'
+        }"
+      >
+        <i class="pi pi-users"></i>
+        <span>{{ item.members.size }} Alumnos Inscritos</span>
       </div>
-      }
-    </div>
-  
-    <ng-template pTemplate="footer">
-      <div class="flex justify-content-end">
-        <p-button
-          label="Cerrar"
-          [text]="true"
+
+      <!-- Menu de Estado con SplitButton -->
+      <div class="flex flex-column gap-2 mb-3">
+        <span class="text-xs font-bold uppercase text-500">Estado de la Sesión</span>
+        <p-splitbutton
+          [label]="getStatusLabel(item.status)"
+          [icon]="getStatusIcon(item.status)"
+          [model]="getStatusMenuItems(item)"
           severity="secondary"
-          (click)="visibleDialog.set(false)"
-        />
+          size="small"
+          styleClass="w-full"
+          class="w-full"
+          [disabled]="item.status === 'finished'"
+        ></p-splitbutton>
       </div>
+
+      <div class="flex flex-wrap gap-1 mt-2">
+        @for (name of getMemberNames(item.members); track name) {
+        <span
+          class="px-2 py-1 border-round-md text-xs font-medium"
+          [ngClass]="{
+            'bg-green-100 text-green-800': item.status === 'active',
+            'bg-yellow-100 text-yellow-800': item.status === 'planned',
+            'bg-red-100 text-red-800': item.status === 'canceled'
+          }"
+        >
+          {{ name }}
+        </span>
+        }
+      </div>
+    </div>
+    } @empty {
+    <div class="text-center p-4 text-600">
+      No hay clases programadas para este día.
+    </div>
+    }
+  </div>
+
+  <ng-template pTemplate="footer">
+    <div class="flex justify-content-end">
+      <p-button
+        label="Cerrar"
+        variant="outlined"
+        severity="secondary"
+        (click)="visibleDialog.set(false)"
+      />
+    </div>
   </ng-template>
-  </p-dialog>
+</p-dialog>
