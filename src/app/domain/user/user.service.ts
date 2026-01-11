@@ -10,10 +10,10 @@ export class UserService extends CrudService<User> {
 
   getLoggedUser(): Promise<User | null> {
     return Promise.resolve(User.fromJson({
-      id: '1',
-      email: 'test@test.com',
-      name: 'Test User',
-      phone: '123456789',
+      id: 'fvtBjLsAesxRVqCj9ymy',
+      email: 'correoelectronicoderafa@gmail.com',
+      name: 'Rafael',
+      phone: '666666666',
       darkMode: false,
       role: 'user',
       verified: true

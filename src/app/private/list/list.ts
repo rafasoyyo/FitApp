@@ -1,36 +1,73 @@
-import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { AccordionModule } from 'primeng/accordion';
 import { AvatarModule } from 'primeng/avatar';
 import { BadgeModule } from 'primeng/badge';
 import { ButtonModule } from 'primeng/button';
-import { Listbox } from 'primeng/listbox';
+import { ListboxModule } from 'primeng/listbox';
 
-interface City {
-    name: string,
-    code: string
-}
+import { RouterLink } from '@angular/router';
+
+import { Agenda } from '../../domain/agenda/agenda';
+import { AgendaService } from '../../domain/agenda/agenda.service';
+import { User } from '../../domain/user/user';
+import { UserService } from '../../domain/user/user.service';
 
 @Component({
   selector: 'app-list',
-  imports: [FormsModule, AccordionModule, AvatarModule, BadgeModule, ButtonModule, Listbox],
+    standalone: true,
+    imports: [
+        CommonModule,
+        FormsModule,
+        AccordionModule,
+        AvatarModule,
+        BadgeModule,
+        ButtonModule,
+        ListboxModule,
+        RouterLink
+    ],
   templateUrl: './list.component.html',
   styleUrl: './list.component.css'
 })
 export class List implements OnInit {
-    cities!: City[];
+    private agendaService = inject(AgendaService);
+    private userService = inject(UserService);
 
-    selectedCity!: City;
+    enrolledClasses = signal<Agenda[]>([]);
+    allUsers = signal<User[]>([]);
+    loggedUser = signal<User | null>(null);
 
     ngOnInit() {
-        this.cities = [
-            { name: 'usuario1@gmail.com', code: '1' },
-            { name: 'usuario2@gmail.com', code: '2' },
-            { name: 'usuario3@gmail.com', code: '3' },
-            { name: 'usuario4@gmail.com', code: '4' },
-            { name: 'usuario5@gmail.com', code: '5' },
-            { name: 'usuario6@gmail.com', code: '6' },
-            { name: 'usuario7@gmail.com', code: '7' },
-        ];
+        this.loadData();
+    }
+
+    async loadData() {
+        const [user, users, allAgenda] = await Promise.all([
+            this.userService.getLoggedUser(),
+            this.userService.list(),
+            this.agendaService.list()
+        ]);
+
+        this.loggedUser.set(user);
+        this.allUsers.set(users);
+
+        if (user) {
+            const myClasses = allAgenda.filter(a => a.members.has(user.id));
+            // Sort by day and hour
+            const dayOrder: any = { 'lunes': 1, 'martes': 2, 'miercoles': 3, 'jueves': 4, 'viernes': 5 };
+            myClasses.sort((a, b) => {
+                if (dayOrder[a.day] !== dayOrder[b.day]) {
+                    return dayOrder[a.day] - dayOrder[b.day];
+                }
+                return a.startHour.localeCompare(b.startHour);
+            });
+            this.enrolledClasses.set(myClasses);
+        }
+    }
+
+    getMemberData(memberIds: Set<string>): User[] {
+        const ids = Array.from(memberIds);
+        return this.allUsers().filter(u => ids.includes(u.id));
     }
 }

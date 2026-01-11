@@ -2,179 +2,82 @@
   <p class="text-2xl font-bold my-3">Tus próximas clases</p>
 </div>
 
-<p-accordion value="0">
-  <p-accordion-panel value="0">
+<p-accordion
+  [value]="['0']"
+  multiple="true"
+>
+  @for (item of enrolledClasses(); track item.id; let i = $index) {
+  <p-accordion-panel [value]="i.toString()">
     <p-accordion-header class="p-2">
-      <ng-template
-        #toggleicon
-        let-active="active"
-      >
-        @if (active) {
-        <i class="pi pi-minus"></i>
-        } @else {
-        <i class="pi pi-plus"></i>
-        }
-      </ng-template>
-      <span class="flex items-center align-items-center gap-2 w-full">
-        <p-avatar
-          icon="pi pi-check"
-          shape="circle"
-          [pt]="{root: {class: 'bg-green-100'}}"
-        />
-        <span class="text-lg font-bold whitespace-nowrap">Martes 20 Enero -
-          18:00</span>
-        <p-badge
-          value="3 + 3"
-          class="ml-auto mr-2"
-          severity="secondary"
-        />
-      </span>
-    </p-accordion-header>
-    <p-accordion-content>
-      <div>
-        <p class="font-bold my-2 block">Miembros</p>
-        <p-listbox
-          [options]="cities.slice(0, 3)"
-          [(ngModel)]="selectedCity"
-          optionLabel="name"
-          scrollHeight="50vh"
-          class="w-full border-none"
-        />
-      </div>
-      <div class="my-2"></div>
-      <div>
-        <div class="flex justify-content-between align-items-center">
-          <p class="font-bold my-2">Invitados</p>
-          <p-button
-            label="Apuntarme"
-            severity="success"
-            size="small"
+        <ng-template
+          #toggleicon
+          let-active="active"
+        >
+          <i [class]="active ? 'pi pi-minus' : 'pi pi-plus'"></i>
+        </ng-template>
+        <div class="flex align-items-center gap-3 w-full pr-3">
+          <p-avatar
+            icon="pi pi-calendar"
+            shape="circle"
+            class="flex-shrink-0"
+            [pt]="{ root: { class: 'bg-primary-100 text-primary' } }"
+          />
+          <div class="flex flex-column text-left">
+            <span class="text-lg font-bold capitalize">{{ item.day }}</span>
+            <span class="text-sm text-600 font-medium">{{ item.startHour }} - {{
+              item.endHour }}</span>
+          </div>
+          <p-badge
+            [value]="item.members.size.toString()"
+            class="ml-auto"
+            severity="info"
           />
         </div>
-        <p-listbox
-          [options]="cities.slice(3, 6)"
-          [(ngModel)]="selectedCity"
-          optionLabel="name"
-          scrollHeight="50vh"
-          class="w-full border-none"
-        />
-      </div>
-    </p-accordion-content>
-  </p-accordion-panel>
-  <p-accordion-panel value="1">
-    <p-accordion-header class="p-3">
-      <ng-template
-        #toggleicon
-        let-active="active"
-      >
-        @if (active) {
-        <i class="pi pi-minus"></i>
-        } @else {
-        <i class="pi pi-plus"></i>
-        }
-      </ng-template>
-      <span class="flex items-center align-items-center gap-2 w-full">
-        <p-avatar
-          icon="pi pi-check"
-          shape="circle"
-          [pt]="{root: {class: 'bg-green-100'}}"
-        />
-        <span class="text-lg font-bold whitespace-nowrap">Martes 27 Enero -
-          19:17</span>
-        <p-badge
-          value="7 + 0"
-          class="ml-auto mr-2"
-          severity="secondary"
-        />
-      </span>
-    </p-accordion-header>
-    <p-accordion-content>
-      <div>
-        <p class="font-bold my-2 block">Miembros</p>
-        <p-listbox
-          [options]="cities"
-          [(ngModel)]="selectedCity"
-          optionLabel="name"
-          scrollHeight="50vh"
-          class="w-full border-none"
-        />
-      </div>
-      <div class="my-2"></div>
-      <div>
-        <div class="flex justify-content-between align-items-center">
-          <p class="font-bold my-2">Invitados</p>
-          <p-button
-            label="Apuntarme"
-            severity="success"
-            size="small"
-          />
+        </p-accordion-header>
+        <p-accordion-content>
+        <div class="flex flex-column gap-3">
+          <div>
+            <p class="font-bold text-sm text-600 mb-2 uppercase tracking-wider">Compañeros
+              de clase</p>
+            <p-listbox
+              [options]="getMemberData(item.members)"
+              optionLabel="name"
+              scrollHeight="250px"
+              class="w-full border-none"
+              styleClass="border-none p-0"
+              [listStyle]="{ 'padding': '0' }"
+            >
+              <ng-template let-user pTemplate="item">
+                <div class="flex align-items-center gap-3 py-1">
+                  <div
+                    class="w-2rem h-2rem border-circle flex align-items-center justify-content-center font-bold text-xs"
+                    [style]="{ backgroundColor: user.bgColor, color: user.color }"
+                  >
+                    {{ user.capitalLetter }}
+                  </div>
+                  <div class="flex flex-column">
+                    <span class="font-medium text-sm">{{ user.name }} {{ user.id ===
+                      loggedUser()?.id ? '(Tú)' : '' }}</span>
+                    <span class="text-xs text-500">{{ user.email }}</span>
+                  </div>
+                </div>
+              </ng-template>
+            </p-listbox>
+            </div>
         </div>
-        <p-listbox
-          [options]="cities.slice(6, 6)"
-          [(ngModel)]="selectedCity"
-          optionLabel="name"
-          scrollHeight="50vh"
-          class="w-full border-none"
-        />
-      </div>
-    </p-accordion-content>
-  </p-accordion-panel>
-  <p-accordion-panel value="2">
-    <p-accordion-header class="p-3">
-      <ng-template
-        #toggleicon
-        let-active="active"
-      >
-        @if (active) {
-        <i class="pi pi-minus"></i>
-        } @else {
-        <i class="pi pi-plus"></i>
-        }
-      </ng-template>
-      <span class="flex items-center align-items-center gap-2 w-full">
-        <p-avatar
-          icon="pi pi-times"
-          shape="circle"
-          [pt]="{root: {class: 'bg-red-100'}}"
-        />
-        <span class="text-lg font-bold whitespace-nowrap">Martes 3 Febrero -
-          20:30</span>
-        <p-badge
-          value="2 + 3"
-          class="ml-auto mr-2"
-          severity="secondary"
-        />
-      </span>
-    </p-accordion-header>
-    <p-accordion-content>
-      <div>
-        <p class="font-bold my-2 block">Miembros</p>
-        <p-listbox
-          [options]="cities.slice(0, 2)"
-          [(ngModel)]="selectedCity"
-          optionLabel="name"
-          scrollHeight="50vh"
-          class="w-full border-none"
-        />
-      </div>
-      <div class="my-2"></div>
-      <div>
-        <div class="flex justify-content-between align-items-center">
-          <p class="font-bold my-2">Invitados</p>
-          <p-button
-            label="Apuntarme"
-            severity="success"
-            size="small"
-          />
-        </div>
-        <p-listbox
-          [options]="cities.slice(4, 7)"
-          [(ngModel)]="selectedCity"
-          optionLabel="name"
-          scrollHeight="50vh"
-          class="w-full border-none"
-        />
-      </div>
-    </p-accordion-content>
-  </p-accordion-panel>
+        </p-accordion-content>
+        </p-accordion-panel>
+  } @empty {
+  <div class="flex flex-column align-items-center gap-3 p-8">
+    <i class="pi pi-calendar-times text-5xl text-300"></i>
+    <span class="text-xl text-center text-600 font-medium">No estás inscrito en
+      ninguna clase todavía.</span>
+    <p-button
+      label="Ver Calendario"
+      [routerLink]="['/calendar']"
+      severity="help"
+      size="small"
+    />
+  </div>
+  }
 </p-accordion>

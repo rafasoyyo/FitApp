@@ -22,7 +22,6 @@ export class Layout implements OnInit {
     fetch('https://fitcenter.web.app/ngsw.json')
       .then(res => res.json())
       .then(data => {
-        debugger
         if (data.appData && data.appData.version) {
           this.version.set(data.appData.version);
         }
