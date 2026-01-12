@@ -1,0 +1,60 @@
+<p class="my-0 text-2xl font-bold">Entrada</p>
+<hr class="my-3">
+
+<p-message *ngIf="errorMessage" severity="error" [text]="errorMessage" styleClass="w-full mb-3"></p-message>
+
+<form [formGroup]="loginForm" (ngSubmit)="login()" class="flex flex-column gap-3">
+  <!-- Email -->
+  <div class="flex flex-column gap-1">
+    <label for="email">Correo electrónico</label>
+    <input
+      pInputText
+      id="email"
+      type="email"
+      formControlName="email"
+      placeholder="Ej: correo@ejemplo.com"
+      [class.ng-invalid]="loginForm.get('email')?.invalid && loginForm.get('email')?.touched"
+      [class.ng-dirty]="loginForm.get('email')?.touched"
+    />
+    <small class="text-red-500" *ngIf="loginForm.get('email')?.touched && loginForm.get('email')?.errors?.['required']">
+      El correo electrónico es obligatorio.
+    </small>
+    <small class="text-red-500" *ngIf="loginForm.get('email')?.touched && loginForm.get('email')?.errors?.['email']">
+      El formato del correo es inválido.
+    </small>
+  </div>
+<!-- Password -->
+<div class="flex flex-column gap-1">
+  <label for="password">Contraseña</label>
+  <p-password id="password" formControlName="password" [feedback]="false" [toggleMask]="true"
+      placeholder="Tu contraseña"
+      styleClass="w-full"
+      inputStyleClass="w-full"
+      [class.ng-invalid]="loginForm.get('password')?.invalid && loginForm.get('password')?.touched"
+      [class.ng-dirty]="loginForm.get('password')?.touched"
+    ></p-password>
+    <small class="text-red-500"
+      *ngIf="loginForm.get('password')?.touched && loginForm.get('password')?.errors?.['required']">
+      La contraseña es obligatoria.
+    </small>
+  </div>
+<p-button label="Iniciar sesión" type="submit" [loading]="loginForm.pending"
+  [style]="{ width: '100%', marginTop: '1rem' }"></p-button>
+
+<div class="flex gap-2 mt-2">
+  <p-button label="Mock User" icon="pi pi-user" severity="secondary" variant="outlined" class="flex-grow-1"
+    (click)="mockLogin('user')"></p-button>
+    <p-button
+      label="Mock Admin"
+      icon="pi pi-shield"
+      severity="secondary"
+      variant="outlined"
+      class="flex-grow-1"
+      (click)="mockLogin('admin')"
+    ></p-button>
+  </div>
+<div class="text-center mt-2">
+  <span>¿No tienes cuenta? </span>
+  <a routerLink="/register" class="font-bold cursor-pointer text-primary no-underline">Regístrate aquí</a>
+</div>
+</form>

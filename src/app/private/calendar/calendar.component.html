@@ -1,0 +1,283 @@
+<div class="mx-2 my-3">
+  <full-calendar #calendar [options]="calendarOptions"></full-calendar>
+  <!-- Legend -->
+  <div class="flex flex-wrap gap-4 justify-content-center mt-3 text-xs font-medium text-600">
+    <div class="flex align-items-center gap-2">
+      <div class="flex align-items-center gap-2">
+        <div class="w-1rem h-1rem border-round shadow-1" style="background-color: #facc15"></div>
+        <span>Planeada</span>
+      </div>
+      <div class="w-1rem h-1rem border-round shadow-1" style="background-color: #22c55e"></div>
+      <span>Preparada</span>
+    </div>
+    <div class="flex align-items-center gap-2">
+      <div class="w-1rem h-1rem border-round shadow-1" style="background-color: #b1b1b1ff"></div>
+      <span>Finalizada</span>
+    </div>
+    <div class="flex align-items-center gap-2">
+      <div class="w-1rem h-1rem border-round shadow-1" style="background-color: #ef4444"></div>
+      <span>Cancelada</span>
+    </div>
+  </div>
+</div>
+
+<p-dialog header="Clase" [visible]="visibleDialog()" (visibleChange)="visibleDialog.set($event)" [modal]="true"
+  [style]="{ width: '90vw', maxWidth: '400px' }" [draggable]="false" [resizable]="false" [dismissableMask]="true" [pt]="{
+    header: {
+      class: 'pb-2'
+    }
+  }">
+  <div class="flex flex-column gap-3">
+    @for (item of selectedClass(); track item.agendaId) {
+    <div class="-mx-2 p-3 border-3 border-round-lg flex flex-column gap-2 text-600" [ngClass]="{
+            'border-green-300': item.status === 'active',
+            'border-yellow-300': item.status === 'planned',
+            'border-red-300': item.status === 'canceled',
+            'border-gray-300': item.status === 'finished'
+          }">
+      <!-- Fecha -->
+      <div class="flex flex-row gap-2 mt-2">
+        <span class="text-lg font-bold uppercase">
+          <i class="pi pi-calendar"></i>
+          Fecha:
+        </span>
+        <span class="font-bold">
+          {{ selectedDate() }}
+        </span>
+      </div>
+
+      <!-- Status -->
+      <div class="flex flex-row gap-2 mt-2">
+        <span class="text-lg font-bold uppercase">
+          <i class="pi pi-circle"></i>
+          Status:
+        </span>
+        <span class="font-bold">
+          {{getStatusLabel(item.status)}}
+        </span>
+      </div>
+
+      <!-- Hora -->
+      <div class="flex flex-row gap-2 mt-2">
+        <span class="text-lg font-bold uppercase">
+          <i class="pi pi-clock"></i>
+          Hora:
+        </span>
+        <span class="font-bold">
+          {{ item.startHour }} - {{ item.endHour }}
+        </span>
+      </div>
+    </div>
+
+    <!-- Notas -->
+    @if (item.note) {
+    <div class="flex flex-column gap-2 pt-2 text-600">
+      <span class="text-lg font-bold uppercase">
+        <i class="pi pi-info-circle"></i>
+        Notas:
+      </span>
+      <p class="m-0 text-sm italic">{{ item.note }}</p>
+    </div>
+    }
+
+    <!-- Lista de Alumnos -->
+    <div class="flex flex-column gap-2 pt-2">
+      <span class="text-lg font-bold uppercase">
+        <i class="pi pi-users"></i>
+        {{ item.members.size }}
+        Alumnos
+        Inscritos
+      </span>
+      <div class="flex flex-wrap gap-2">
+        @for (user of getMembers(item.members); track user.id) {
+        <div class="flex align-items-center gap-2 px-2 py-1 border-round-lg border-1" [ngClass]="{
+                'bg-green-100 border-green-200 text-green-900': item.status === 'active',
+                'bg-yellow-100 border-yellow-200 text-yellow-900': item.status === 'planned',
+                'bg-red-100 border-red-200 text-red-900': item.status === 'canceled',
+                'bg-gray-100 border-gray-200 text-gray-900': item.status === 'finished'
+              }">
+          <div class="w-1rem h-1rem border-circle flex align-items-center justify-content-center font-bold text-xs"
+            [style.backgroundColor]="user.bgColor" [style.color]="user.color">
+            {{ user.capitalLetter }}
+          </div>
+          <span class="text-xs font-semibold">{{ user.name }}</span>
+        </div>
+        } @empty {
+        <span class="text-xs text-400 italic">No hay alumnos inscritos</span>
+        }
+      </div>
+    </div>
+    @if (loggedUser()?.role === 'user') {
+    @if (item.status !== 'active') {
+    <div
+      class="flex align-items-center gap-2 p-2 border-round bg-yellow-50 text-yellow-900 text-xs border-1 border-yellow-100">
+      <i class="pi pi-exclamation-triangle"></i>
+      <span>
+        @switch (item.status) {
+        @case ('planned') { La inscripción no está permitida porque la clase aún no ha sido activada. }
+        @case ('canceled') { La inscripción no está permitida porque la clase ha sido cancelada. }
+        @case ('finished') { La inscripción no está permitida porque la clase ya ha finalizado. }
+        }
+      </span>
+    </div>
+    } @else if (!canChangeMembership(item)) {
+    <div
+      class="flex align-items-center gap-2 p-2 border-round bg-orange-50 text-orange-900 text-xs border-1 border-orange-100">
+      <i class="pi pi-clock"></i>
+      <span>No se permiten cambios en la inscripción (faltan menos de 24 horas para el inicio).</span>
+    </div>
+    } @else if (item.members.size >= 12 && !isUserMember(item.members)) {
+    <div class="flex align-items-center gap-2 p-2 border-round bg-blue-50 text-blue-900 text-xs border-1 border-blue-100">
+      <i class="pi pi-info-circle"></i>
+      <span>La clase está completa (máximo 12 alumnos). No se permiten más inscripciones en este momento.</span>
+    </div>
+    }
+    }
+    } @empty {
+    <div class="text-center p-4 text-600">
+      No hay clases programadas para este día.
+    </div>
+    }
+
+  </div>
+
+  <ng-template pTemplate="footer">
+    <div class="flex justify-content-end gap-2">
+      @let item = selectedClass()[0];
+      @if (item) {
+      @if (loggedUser()?.role === 'admin') {
+      <p-button label="Editar" variant="outlined" severity="warn"
+        (click)="visibleDialog.set(false); visibleEditDialog.set(true)" />
+      }
+
+      @if (loggedUser()?.role === 'user') {
+      @if (item.status === 'active' && canChangeMembership(item)) {
+          @if (isUserMember(item.members)) {
+            <p-button label="No asistiré" variant="outlined" severity="danger" (click)="toggleMembership(item)" />
+            } @else if (item.members.size
+            < 12) { <p-button label="Inscribirse" severity="success" (click)="toggleMembership(item)" />
+            }
+            }
+            }
+            }
+      <p-button label="Cerrar" variant="outlined" severity="secondary" (click)="visibleDialog.set(false)" />
+    </div>
+  </ng-template>
+</p-dialog>
+
+
+<p-dialog header="Clase" [visible]="visibleEditDialog()" (visibleChange)="visibleEditDialog.set($event)" [modal]="true"
+  [style]="{ width: '90vw', maxWidth: '400px' }" [draggable]="false" [resizable]="false" [dismissableMask]="true" [pt]="{
+    header: {
+      class: 'pb-2'
+    }
+  }">
+  <div class="flex flex-column gap-3">
+    @for (item of selectedClass(); track item.agendaId) {
+    <div class="mb-2 -mx-2 p-3 border-3 border-round-lg flex flex-column gap-2 text-600" [ngClass]="{
+            'border-green-300': item.status === 'active',
+            'border-yellow-300': item.status === 'planned',
+            'border-red-300': item.status === 'canceled',
+            'border-gray-300': item.status === 'finished'
+          }">
+      <!-- Fecha -->
+      <div class="flex flex-row gap-2 mt-2">
+        <span class="text-lg font-bold uppercase">
+          <i class="pi pi-calendar"></i>
+          Fecha:
+        </span>
+        <span class="font-bold">
+          {{ selectedDate() }}
+        </span>
+      </div>
+
+      <!-- Status -->
+      <div class="flex flex-row gap-2 mt-2">
+        <span class="text-lg font-bold uppercase">
+          <i class="pi pi-circle"></i>
+          Status:
+        </span>
+        <span class="font-bold">
+          {{getStatusLabel(item.status)}}
+        </span>
+      </div>
+
+      <!-- Hora -->
+      <div class="flex flex-row gap-2 mt-2">
+        <span class="text-lg font-bold uppercase">
+          <i class="pi pi-clock"></i>
+          Hora:
+        </span>
+        <span class="font-bold">
+          {{ item.startHour }} - {{ item.endHour }}
+        </span>
+      </div>
+    </div>
+
+    <!-- Botones de Estado -->
+    <div class="flex flex-column gap-2 mb-3">
+      <span class="text-xs font-bold uppercase">Estado de la Sesión</span>
+      <div class="flex flex-row justify-content-between gap-2">
+        <p-button label="Planear" icon="pi pi-clock" [variant]="item.status === 'planned' ? undefined : 'outlined'"
+          severity="warn" size="small" class="flex-1" [disabled]="item.status === 'finished'"
+          (click)="item.status = 'planned'" />
+        <p-button label="Activar" icon="pi pi-check" [variant]="item.status === 'active' ? undefined : 'outlined'"
+          severity="success" size="small" class="flex-1" [disabled]="item.status === 'finished'"
+          (click)="item.status = 'active'" />
+        <p-button label="Anular" icon="pi pi-times" [variant]="item.status === 'canceled' ? undefined : 'outlined'"
+          severity="danger" size="small" class="flex-1" [disabled]="item.status === 'finished'"
+          (click)="item.status = 'canceled'" />
+      </div>
+    </div>
+
+    <!-- Notas de la Sesión -->
+    <div class="flex flex-column gap-2 mb-3">
+      <span class="text-xs font-bold uppercase">Notas de la Sesión</span>
+      <textarea pTextarea [(ngModel)]="item.note" rows="3" class="w-full"
+        placeholder="Añade alguna nota técnica o recordatorio..."></textarea>
+    </div>
+
+    <!-- Lista de Asistencia -->
+    <div class="flex flex-column gap-2">
+      <span class="text-lg font-bold uppercase">
+        <i class="pi pi-users"></i>
+        {{ getMembers(item.members).length }}
+        Inscritos / {{ selectedMembers().length }}
+        Asistentes
+      </span>
+      <div class="flex flex-wrap gap-2">
+
+        <p-listbox [options]="getMembers(item.members)" [ngModel]="selectedMembers()" [checkbox]="true" [multiple]="true"
+          [showToggleAll]="false" (onChange)="onMembersChange($event)" optionLabel="name" scrollHeight="250px"
+          class="w-full border-none p-0" [listStyle]="{ 'padding': '0' }">
+          <ng-template let-user pTemplate="item">
+            <div class="flex align-items-center gap-1 -my-1">
+
+              <div class="w-2rem h-2rem border-circle flex align-items-center justify-content-center font-bold text-xs"
+                [style]="{ backgroundColor: user.bgColor, color: user.color }">
+                {{ user.capitalLetter }}
+              </div>
+              <div class="flex flex-column">
+                <span class="font-medium text-sm">{{ user.name }}</span>
+                <span class="text-xs text-500">{{ user.email }}</span>
+              </div>
+            </div>
+          </ng-template>
+        </p-listbox>
+
+      </div>
+    </div>
+    } @empty {
+    <div class="text-center p-4 text-600">
+      No hay clases programadas para este día.
+    </div>
+    }
+  </div>
+
+  <ng-template pTemplate="footer">
+    <div class="flex justify-content-end gap-2">
+      <p-button label="Guardar" severity="success" (click)="updateLessonStatus()" />
+      <p-button label="Cerrar" variant="outlined" severity="secondary" (click)="visibleEditDialog.set(false)" />
+    </div>
+  </ng-template>
+</p-dialog>

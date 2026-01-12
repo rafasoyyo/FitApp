@@ -1,0 +1,12 @@
+:host {
+  display: block;
+  height: 100vh;
+  background-image: url('/fitness_login_background_1767892215695.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+.h-screen {
+    height: 100%;
+    background: rgba(0, 0, 0, 0.4); /* Overlay for readability */
+}

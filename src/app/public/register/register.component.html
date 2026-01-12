@@ -1,0 +1,85 @@
+<p class="my-0 text-2xl font-bold">Registro</p>
+<hr class="my-3">
+
+<p-message *ngIf="errorMessage" severity="error" [text]="errorMessage" styleClass="w-full mb-3"></p-message>
+
+<form [formGroup]="registerForm" (ngSubmit)="register()" class="flex flex-column gap-3">
+  <!-- Nombre -->
+  <div class="flex flex-column gap-1">
+    <label for="nombre">Nombre completo *</label>
+    <input pInputText id="nombre" formControlName="nombre" placeholder="Ej: Juan Pérez"
+      [class.ng-invalid]="registerForm.get('nombre')?.invalid && registerForm.get('nombre')?.touched"
+      [class.ng-dirty]="registerForm.get('nombre')?.touched" />
+    <small class="text-red-500" *ngIf="registerForm.get('nombre')?.invalid && registerForm.get('nombre')?.touched">
+      El nombre es obligatorio.
+    </small>
+  </div>
+
+  <!-- Email -->
+  <div class="flex flex-column gap-1">
+    <label for="email">Correo electrónico *</label>
+    <input pInputText id="email" type="email" formControlName="email" placeholder="correo@ejemplo.com"
+      [class.ng-invalid]="registerForm.get('email')?.invalid && registerForm.get('email')?.touched"
+      [class.ng-dirty]="registerForm.get('email')?.touched" />
+    <small class="text-red-500"
+      *ngIf="registerForm.get('email')?.touched && registerForm.get('email')?.errors?.['required']">
+      El correo es obligatorio.
+    </small>
+    <small class="text-red-500"
+      *ngIf="registerForm.get('email')?.touched && registerForm.get('email')?.errors?.['email']">
+      El formato del correo es inválido.
+    </small>
+  </div>
+
+  <!-- Teléfono -->
+  <div class="flex flex-column gap-1">
+    <label for="telefono">Teléfono (opcional)</label>
+    <input
+      pInputText
+      id="telefono"
+      formControlName="telefono"
+      placeholder="600 000 000"
+    />
+  </div>
+<!-- Contraseña -->
+<div class="flex flex-column gap-1">
+  <label for="password">Contraseña *</label>
+  <p-password id="password" formControlName="password" [feedback]="true" [toggleMask]="true"
+      placeholder="Mínimo 6 caracteres"
+      styleClass="w-full"
+      inputStyleClass="w-full"
+      [class.ng-invalid]="registerForm.get('password')?.invalid && registerForm.get('password')?.touched"
+      [class.ng-dirty]="registerForm.get('password')?.touched"
+    ></p-password>
+    <small class="text-red-500"
+      *ngIf="registerForm.get('password')?.touched && registerForm.get('password')?.errors?.['required']">
+      La contraseña es obligatoria.
+    </small>
+    <small class="text-red-500"
+      *ngIf="registerForm.get('password')?.touched && registerForm.get('password')?.errors?.['minlength']">
+      La contraseña debe tener al menos 6 caracteres.
+    </small>
+  </div>
+<!-- Verifica Contraseña -->
+<div class="flex flex-column gap-1">
+  <label for="confirmPassword">Verifica contraseña *</label>
+  <p-password id="confirmPassword" formControlName="confirmPassword" [feedback]="false" [toggleMask]="true"
+    placeholder="Repite tu contraseña" styleClass="w-full" inputStyleClass="w-full"
+    [class.ng-invalid]="(registerForm.get('confirmPassword')?.invalid || registerForm.hasError('mismatch')) && registerForm.get('confirmPassword')?.touched"
+    [class.ng-dirty]="registerForm.get('confirmPassword')?.touched"></p-password>
+  <small class="text-red-500"
+    *ngIf="registerForm.get('confirmPassword')?.touched && registerForm.get('confirmPassword')?.errors?.['required']">
+    Debes verificar la contraseña.
+  </small>
+  <small class="text-red-500" *ngIf="registerForm.get('confirmPassword')?.touched && registerForm.hasError('mismatch')">
+    Las contraseñas no coinciden.
+  </small>
+  </div>
+
+  <p-button
+    label="Registrarse"
+    type="submit"
+    [loading]="registerForm.pending"
+    [style]="{ width: '100%', marginTop: '1rem' }"
+  ></p-button>
+</form>

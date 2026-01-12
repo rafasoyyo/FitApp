@@ -1,0 +1,5 @@
+::ng-deep .p-listbox-option-selected,
+::ng-deep .p-listbox-option-selected:hover {
+  background: transparent !important;
+  color: var(--primary-color) !important;
+}

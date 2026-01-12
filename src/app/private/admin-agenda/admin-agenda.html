@@ -1,0 +1,275 @@
+<div
+  id="agenda-management-container"
+  class=""
+>
+  <div
+    class="header-section flex flex-column md:flex-row justify-content-between align-items-start md:align-items-center m-3"
+  >
+    <div>
+      <h1 class="text-3xl md:text-4xl font-bold m-0 text-900">Horarios de Clases
+      </h1>
+      <p class="text-600 m-0 mt-2">Configura las sesiones semanales del centro.
+      </p>
+    </div>
+    <p-button
+      label="Nueva Clase"
+      icon="pi pi-plus"
+      severity="help"
+      size="small"
+      class="mt-3 md:mt-0"
+      (click)="openNew()"
+    />
+  </div>
+
+  <p-listbox
+    [options]="agendaItems()"
+    dataKey="id"
+    [filter]="true"
+    filterBy="day,startHour,memberNames"
+    [style]="{ width: '100%' }"
+    [listStyle]="{ 'max-height': 'calc(100vh - 350px)' }"
+    styleClass="border-none"
+  >
+    <ng-template
+      pTemplate="item"
+      let-item
+    >
+      <p-card [pt]="{ root: { class: 'w-full' }, body: { class: 'p-3' } }">
+        <div class="flex align-items-center gap-4 w-full">
+
+          <!-- Class Details -->
+          <div class="flex flex-column gap-2 flex-grow-1">
+            <div
+              class="flex flex-row justify-content-between align-items-center"
+            >
+              <div>
+                <span
+                  class="font-bold text-lg line-height-2 block text-900 capitalize"
+                >
+                  {{ item.day }}
+                </span>
+                <span class="text-600 text-sm">
+                  {{ item.startHour }} - {{ item.endHour }}
+                </span>
+              </div>
+
+              <div class="flex align-items-center gap-3">
+                <p-button
+                  icon="pi pi-users"
+                  [label]="item.members.size"
+                  [rounded]="true"
+                  variant="outlined"
+                  severity="info"
+                  size="small"
+                  (click)="openManageMembers(item); $event.stopPropagation()"
+                />
+
+                <p-button
+                  icon="pi pi-trash"
+                  [rounded]="true"
+                  variant="outlined"
+                  severity="danger"
+                  size="small"
+                  (click)="deleteAgenda(item); $event.stopPropagation()"
+                />
+              </div>
+            </div>
+            <!-- Members Tags -->
+            <div class="flex flex-wrap gap-1 mt-2">
+              @for (name of item.memberNames; track name) {
+              <span
+                class="px-2 py-1 bg-blue-50 text-blue-700 border-round text-xs font-medium"
+              >
+                {{ name }}
+              </span>
+              }
+            </div>
+          </div>
+        </div>
+      </p-card>
+    </ng-template>
+
+    <ng-template pTemplate="empty">
+      <div class="flex flex-column align-items-center gap-3 p-8">
+        <i class="pi pi-calendar-times text-5xl text-300"></i>
+        <span class="text-xl text-center text-600 font-medium">No hay clases
+          configuradas.</span>
+      </div>
+    </ng-template>
+  </p-listbox>
+
+  <p-confirmDialog />
+
+  <p-dialog
+    [visible]="showMembersDialog()"
+    (visibleChange)="showMembersDialog.set($event)"
+    [modal]="true"
+    [header]="'Gestionar Alumnos'"
+    [style]="{ width: '90vw', maxWidth: '400px' }"
+    [draggable]="false"
+    [resizable]="false"
+  >
+    <div class="flex flex-column gap-3 py-2">
+      <p class="text-600 text-sm m-0">Selecciona los alumnos que asistirán a
+        esta clase:</p>
+
+      <p-listbox
+        [options]="users()"
+        [ngModel]="selectedMemberIds()"
+        (ngModelChange)="selectedMemberIds.set($event)"
+        [multiple]="true"
+        [filter]="true"
+        optionLabel="name"
+        optionValue="id"
+        [style]="{ width: '100%' }"
+        [listStyle]="{ 'max-height': '300px' }"
+        styleClass="border-1 border-200 border-round-md"
+      >
+        <ng-template
+          let-user
+          pTemplate="item"
+        >
+          <div class="flex align-items-center gap-3">
+            <div
+              class="w-2rem h-2rem border-circle flex align-items-center justify-content-center font-bold text-xs"
+              [style]="{backgroundColor: user.bgColor, color: user.color}"
+            >
+              {{ user.capitalLetter }}
+            </div>
+            <div class="flex flex-column">
+              <span class="font-medium text-sm">{{ user.name }}</span>
+              <span class="text-xs text-500">{{ user.email }}</span>
+            </div>
+          </div>
+        </ng-template>
+      </p-listbox>
+    </div>
+
+    <ng-template pTemplate="footer">
+      <div class="flex justify-content-end gap-2 pt-2">
+        <p-button
+          label="Cerrar"
+          severity="secondary"
+          variant="outlined"
+          size="small"
+          (click)="showMembersDialog.set(false)"
+        />
+        <p-button
+          label="Guardar"
+          severity="info"
+          size="small"
+          (click)="saveMembers()"
+        />
+      </div>
+    </ng-template>
+  </p-dialog>
+
+  <p-dialog
+    [visible]="showAddDialog()"
+    (visibleChange)="showAddDialog.set($event)"
+    [modal]="true"
+    [header]="'Nueva Clase'"
+    [style]="{ width: '90vw', maxWidth: '350px' }"
+    [draggable]="false"
+    [resizable]="false"
+  >
+    <div class="flex flex-column gap-3 py-2">
+      <!-- Day Selection -->
+      <div class="flex flex-column gap-1">
+        <label
+          for="day"
+          class="font-bold text-xs text-500"
+        >Día de la semana</label>
+        <p-select
+          id="day"
+          [options]="days"
+          [(ngModel)]="newItem.day"
+          optionLabel="label"
+          optionValue="value"
+          placeholder="Selecciona"
+          class="w-full"
+          size="small"
+        />
+      </div>
+
+      <div class="flex flex-column gap-2">
+        <!-- Start Date -->
+        <div class="flex flex-column gap-1 flex-1">
+          <label
+            for="startDay"
+            class="font-bold text-xs text-500"
+          >Desde</label>
+          <input pInputText
+            id="startDay"
+            type="date"
+            [(ngModel)]="newItem.startDay"
+            class="w-full"
+          />
+        </div>
+
+        <!-- End Date -->
+        <div class="flex flex-column gap-1 flex-1">
+          <label
+            for="endDay"
+            class="font-bold text-xs text-500"
+          >Hasta</label>
+          <input pInputText
+            id="endDay"
+            type="date"
+            [(ngModel)]="newItem.endDay"
+            class="w-full"
+          />
+        </div>
+      </div>
+
+      <div class="flex flex-column gap-2">
+        <!-- Start Hour -->
+        <div class="flex flex-column gap-1 flex-1">
+          <label
+            for="startHour"
+            class="font-bold text-xs text-500"
+          >Hora Inicio</label>
+          <input pInputText
+            id="startHour"
+            type="time"
+            [(ngModel)]="newItem.startHour"
+            class="w-full"
+          />
+        </div>
+
+        <!-- End Hour -->
+        <div class="flex flex-column gap-1 flex-1">
+          <label
+            for="endHour"
+            class="font-bold text-xs text-500"
+          >Hora Fin</label>
+          <input pInputText
+            id="endHour"
+            type="time"
+            [(ngModel)]="newItem.endHour"
+            class="w-full"
+          />
+        </div>
+      </div>
+    </div>
+
+    <ng-template pTemplate="footer">
+      <div class="flex justify-content-end gap-2 pt-2">
+        <p-button
+          label="Cancelar"
+          severity="secondary"
+          [text]="true"
+          size="small"
+          (click)="showAddDialog.set(false)"
+        />
+        <p-button
+          label="Crear"
+          severity="help"
+          size="small"
+          (click)="saveAgenda()"
+          [disabled]="!newItem.startHour || !newItem.endHour || !newItem.startDay || !newItem.endDay"
+        />
+      </div>
+    </ng-template>
+  </p-dialog>
+</div>

@@ -1,0 +1,21 @@
+::ng-deep .my-app-dark .fc-col-header-cell-cushion {
+  color: #2c2c2c !important;
+}
+
+::ng-deep .fc .fc-toolbar-title {
+  font-size: 1.25rem !important;
+  font-weight: 600;
+}
+
+::ng-deep .fc .fc-toolbar-title::first-letter {
+  text-transform: capitalize !important;
+}
+
+::ng-deep .fc .fc-button {
+  padding: 0.4rem 0.6rem !important;
+  font-size: 0.875rem !important;
+}
+
+::ng-deep .p-dialog .p-dialog-header .p-dialog-title {
+  font-size: 1.1rem !important;
+}

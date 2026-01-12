@@ -1,21 +1,26 @@
-import { ApplicationConfig, provideBrowserGlobalErrorListeners, provideZonelessChangeDetection } from '@angular/core';
+import { ApplicationConfig, provideBrowserGlobalErrorListeners, provideZonelessChangeDetection, isDevMode } from '@angular/core';
 import { provideRouter } from '@angular/router';
+import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
+import { provideServiceWorker } from '@angular/service-worker';
 
 import { initializeApp, provideFirebaseApp } from '@angular/fire/app';
 import { getAuth, provideAuth } from '@angular/fire/auth';
 import { getFirestore, provideFirestore } from '@angular/fire/firestore';
-import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
+
 import Material from '@primeng/themes/material';
 import { providePrimeNG } from 'primeng/config';
+import { ConfirmationService } from 'primeng/api';
+
 import { routes } from './app.routes';
 
 const firebaseConfig = {
-  apiKey: 'fake-api-key',
-  authDomain: 'fake-project.firebaseapp.com',
-  projectId: 'fake-project',
-  storageBucket: 'fake-project.firebasestorage.app',
-  messagingSenderId: '1234567890',
-  appId: '1:1234567890:web:123456abcde',
+  apiKey: "AIzaSyDmISZtIh4TBnGJcI3VVrZOo5yAu--V6aI",
+  authDomain: "fitcenterapp.firebaseapp.com",
+  projectId: "fitcenterapp",
+  storageBucket: "fitcenterapp.firebasestorage.app",
+  messagingSenderId: "714839588094",
+  appId: "1:714839588094:web:83a11951d7e3d1937839af",
+  measurementId: "G-LR8BPBMBFM"
 };
 
 export const appConfig: ApplicationConfig = {
@@ -28,12 +33,17 @@ export const appConfig: ApplicationConfig = {
     provideAuth(() => getAuth()),
     provideFirestore(() => getFirestore()),
     providePrimeNG({
-        theme: {
-            preset: Material,
-            options: {
-                darkModeSelector: '.my-app-dark'
-            }
+      theme: {
+        preset: Material,
+        options: {
+          darkModeSelector: '.my-app-dark'
         }
+      }
+    }),
+    ConfirmationService,
+    provideServiceWorker('ngsw-worker.js', {
+      enabled: !isDevMode(),
+      registrationStrategy: 'registerWhenStable:30000'
     })
   ]
 };
