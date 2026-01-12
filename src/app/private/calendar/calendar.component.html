@@ -21,11 +21,11 @@
   </div>
 </div>
 
-<p-dialog header="Clase" [visible]="visibleDialog()" (visibleChange)="visibleDialog.set($event)" [modal]="true"
-  [style]="{ width: '90vw', maxWidth: '400px' }" [draggable]="false" [resizable]="false" [dismissableMask]="true" [pt]="{
-    header: {
-      class: 'pb-2'
-    }
+<p-dialog header="Detalles de la Clase" [visible]="visibleDialog()" (visibleChange)="visibleDialog.set($event)"
+  [modal]="true" [style]="{ width: '90vw', maxWidth: '400px' }" [draggable]="false" [resizable]="false"
+  [dismissableMask]="true" [pt]="{
+    header: { class: 'pb-2'},
+    footer: { class: 'pt-3' } 
   }">
   <div class="flex flex-column gap-3">
     @for (item of selectedClass(); track item.agendaId) {
@@ -152,25 +152,25 @@
 
       @if (loggedUser()?.role === 'user') {
       @if (item.status === 'active' && canChangeMembership(item)) {
-          @if (isUserMember(item.members)) {
-            <p-button label="No asistiré" variant="outlined" severity="danger" (click)="toggleMembership(item)" />
-            } @else if (item.members.size
-            < 12) { <p-button label="Inscribirse" severity="success" (click)="toggleMembership(item)" />
-            }
-            }
-            }
-            }
+      @if (isUserMember(item.members)) {
+      <p-button label="No asistiré" variant="outlined" severity="danger" (click)="toggleMembership(item)" />
+      } @else if (item.members.size
+      < 12) { <p-button label="Inscribirse" severity="success" (click)="toggleMembership(item)" />
+      }
+      }
+      }
+      }
       <p-button label="Cerrar" variant="outlined" severity="secondary" (click)="visibleDialog.set(false)" />
     </div>
   </ng-template>
 </p-dialog>
 
 
-<p-dialog header="Clase" [visible]="visibleEditDialog()" (visibleChange)="visibleEditDialog.set($event)" [modal]="true"
-  [style]="{ width: '90vw', maxWidth: '400px' }" [draggable]="false" [resizable]="false" [dismissableMask]="true" [pt]="{
-    header: {
-      class: 'pb-2'
-    }
+<p-dialog header="Datos de la clase" [visible]="visibleEditDialog()" (visibleChange)="visibleEditDialog.set($event)"
+  [modal]="true" [style]="{ width: '90vw', maxWidth: '400px' }" [draggable]="false" [resizable]="false"
+  [dismissableMask]="true" [pt]="{
+    header: { class: 'pb-2'},
+    footer: { class: 'pt-3' } 
   }">
   <div class="flex flex-column gap-3">
     @for (item of selectedClass(); track item.agendaId) {
@@ -274,7 +274,7 @@
     }
   </div>
 
-  <ng-template pTemplate="footer">
+  <ng-template pTemplate="footer" [pt]="{ }">
     <div class="flex justify-content-end gap-2">
       <p-button label="Guardar" severity="success" (click)="updateLessonStatus()" />
       <p-button label="Cerrar" variant="outlined" severity="secondary" (click)="visibleEditDialog.set(false)" />
