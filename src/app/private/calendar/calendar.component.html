@@ -69,6 +69,17 @@
       </div>
     </div>
 
+    <!-- Notas -->
+    @if (item.note) {
+    <div class="flex flex-column gap-2 pt-2 text-600">
+      <span class="text-lg font-bold uppercase">
+        <i class="pi pi-info-circle"></i>
+        Notas:
+      </span>
+      <p class="m-0 text-sm italic">{{ item.note }}</p>
+    </div>
+    }
+
     <!-- Lista de Alumnos -->
     <div class="flex flex-column gap-2 pt-2">
       <span class="text-lg font-bold uppercase">
@@ -96,11 +107,38 @@
         }
       </div>
     </div>
+    @if (loggedUser()?.role === 'user') {
+    @if (item.status !== 'active') {
+    <div
+      class="flex align-items-center gap-2 p-2 border-round bg-yellow-50 text-yellow-900 text-xs border-1 border-yellow-100">
+      <i class="pi pi-exclamation-triangle"></i>
+      <span>
+        @switch (item.status) {
+        @case ('planned') { La inscripción no está permitida porque la clase aún no ha sido activada. }
+        @case ('canceled') { La inscripción no está permitida porque la clase ha sido cancelada. }
+        @case ('finished') { La inscripción no está permitida porque la clase ya ha finalizado. }
+        }
+      </span>
+    </div>
+    } @else if (!canChangeMembership(item)) {
+    <div
+      class="flex align-items-center gap-2 p-2 border-round bg-orange-50 text-orange-900 text-xs border-1 border-orange-100">
+      <i class="pi pi-clock"></i>
+      <span>No se permiten cambios en la inscripción (faltan menos de 24 horas para el inicio).</span>
+    </div>
+    } @else if (item.members.size >= 12 && !isUserMember(item.members)) {
+    <div class="flex align-items-center gap-2 p-2 border-round bg-blue-50 text-blue-900 text-xs border-1 border-blue-100">
+      <i class="pi pi-info-circle"></i>
+      <span>La clase está completa (máximo 12 alumnos). No se permiten más inscripciones en este momento.</span>
+    </div>
+    }
+    }
     } @empty {
     <div class="text-center p-4 text-600">
       No hay clases programadas para este día.
     </div>
     }
+
   </div>
 
   <ng-template pTemplate="footer">
@@ -108,20 +146,20 @@
       @let item = selectedClass()[0];
       @if (item) {
       @if (loggedUser()?.role === 'admin') {
-          <p-button label="Editar" variant="outlined" severity="warn"
-            (click)="visibleDialog.set(false); visibleEditDialog.set(true)" />
-        }
-        
-        @if (loggedUser()?.role === 'user' && item.status === 'active') {
+      <p-button label="Editar" variant="outlined" severity="warn"
+        (click)="visibleDialog.set(false); visibleEditDialog.set(true)" />
+      }
+
+      @if (loggedUser()?.role === 'user') {
+      @if (item.status === 'active' && canChangeMembership(item)) {
           @if (isUserMember(item.members)) {
-            <p-button label="No asistiré" variant="outlined" severity="danger"
-              (click)="toggleMembership(item)" />
-          } @else {
-            <p-button label="Inscribirse" severity="success"
-              (click)="toggleMembership(item)" />
-          }
-        }
-        }
+            <p-button label="No asistiré" variant="outlined" severity="danger" (click)="toggleMembership(item)" />
+            } @else if (item.members.size
+            < 12) { <p-button label="Inscribirse" severity="success" (click)="toggleMembership(item)" />
+            }
+            }
+            }
+            }
       <p-button label="Cerrar" variant="outlined" severity="secondary" (click)="visibleDialog.set(false)" />
     </div>
   </ng-template>
@@ -190,6 +228,13 @@
           severity="danger" size="small" class="flex-1" [disabled]="item.status === 'finished'"
           (click)="item.status = 'canceled'" />
       </div>
+    </div>
+
+    <!-- Notas de la Sesión -->
+    <div class="flex flex-column gap-2 mb-3">
+      <span class="text-xs font-bold uppercase">Notas de la Sesión</span>
+      <textarea pTextarea [(ngModel)]="item.note" rows="3" class="w-full"
+        placeholder="Añade alguna nota técnica o recordatorio..."></textarea>
     </div>
 
     <!-- Lista de Asistencia -->

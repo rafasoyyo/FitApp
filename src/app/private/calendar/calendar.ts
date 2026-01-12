@@ -13,6 +13,7 @@ import { DialogModule } from 'primeng/dialog';
 import { SplitButtonModule } from 'primeng/splitbutton';
 
 import { ListboxModule } from 'primeng/listbox';
+import { TextareaModule } from 'primeng/textarea';
 import { AgendaService } from '../../domain/agenda/agenda.service';
 import { Lesson } from '../../domain/lesson/lesson';
 import { LessonService } from '../../domain/lesson/lesson.service';
@@ -22,7 +23,7 @@ import { UserService } from '../../domain/user/user.service';
 @Component({
   selector: 'app-calendar',
   standalone: true,
-  imports: [CommonModule, FormsModule, FullCalendarModule, DialogModule, ButtonModule, CheckboxModule, ListboxModule, SplitButtonModule],
+  imports: [ CommonModule, FormsModule, FullCalendarModule, DialogModule, ButtonModule, CheckboxModule, ListboxModule, SplitButtonModule, TextareaModule ],
   templateUrl: './calendar.component.html',
   styleUrl: './calendar.component.css'
 })
@@ -179,6 +180,7 @@ export class Calendar implements OnInit {
       name: lesson?.name || 'Clase',
       startHour: agenda.startHour,
       endHour: agenda.endHour,
+      note: lesson?.note || '',
       agendaMembers: agenda.members,
       members: lesson?.members || agenda.members
     };
@@ -197,6 +199,14 @@ export class Calendar implements OnInit {
 
   onMembersChange(event: any) {
     this.selectedMembers.set(event.value);
+  }
+
+  canChangeMembership (item: any): boolean {
+    if (!item.date || !item.startHour) return false;
+    const lessonStart = new Date(`${item.date}T${item.startHour}`);
+    const now = new Date();
+    const diffInHours = (lessonStart.getTime() - now.getTime()) / (1000 * 60 * 60);
+    return diffInHours >= 24;
   }
 
   async updateLessonStatus() {
