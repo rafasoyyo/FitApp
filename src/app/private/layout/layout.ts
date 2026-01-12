@@ -4,13 +4,14 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { Router, RouterLink, RouterOutlet } from '@angular/router';
 
 import { DialogModule } from 'primeng/dialog';
+import { ButtonModule } from 'primeng/button';
 import { TabsModule } from 'primeng/tabs';
 import { UserService } from '../../domain/user/user.service';
 
 @Component({
   selector: 'app-layout',
   standalone: true,
-  imports: [ RouterOutlet, RouterLink, TabsModule, CommonModule, DialogModule ],
+  imports: [ RouterOutlet, RouterLink, TabsModule, CommonModule, DialogModule, ButtonModule ],
   templateUrl: './layout.component.html',
   styleUrl: './layout.component.css'
 })
@@ -38,5 +39,10 @@ export class Layout implements OnInit {
         }
       })
       .catch(err => console.error('Error reading ngsw.json', err));
+  }
+
+  async logout () {
+    await this.userService.logout();
+    this.router.navigate([ '/login' ]);
   }
 }

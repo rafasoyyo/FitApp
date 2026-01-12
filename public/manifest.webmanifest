@@ -1,6 +1,6 @@
 {
   "name": "FitCenterApp",
-  "short_name": "FitCenter-App",
+  "short_name": "FitCenter",
   "description": "Fit Center Valencia unofficial App to manage users, classes and agenda",
   "display": "standalone",
   "scope": "./",

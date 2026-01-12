@@ -6,67 +6,102 @@ import { AvatarModule } from 'primeng/avatar';
 import { BadgeModule } from 'primeng/badge';
 import { ButtonModule } from 'primeng/button';
 import { ListboxModule } from 'primeng/listbox';
+import { TagModule } from 'primeng/tag';
 
 import { RouterLink } from '@angular/router';
 
 import { Agenda } from '../../domain/agenda/agenda';
 import { AgendaService } from '../../domain/agenda/agenda.service';
+import { Lesson } from '../../domain/lesson/lesson';
+import { LessonService } from '../../domain/lesson/lesson.service';
 import { User } from '../../domain/user/user';
 import { UserService } from '../../domain/user/user.service';
 
 @Component({
-  selector: 'app-list',
+    selector: 'app-list',
     standalone: true,
     imports: [
         CommonModule,
         FormsModule,
-        AccordionModule,
         AvatarModule,
         BadgeModule,
         ButtonModule,
-        ListboxModule,
-        RouterLink
+        RouterLink,
+        TagModule
     ],
-  templateUrl: './list.component.html',
-  styleUrl: './list.component.css'
+    templateUrl: './list.component.html',
+    styleUrl: './list.component.css'
 })
 export class List implements OnInit {
     private agendaService = inject(AgendaService);
     private userService = inject(UserService);
+    private lessonService = inject(LessonService);
 
-    enrolledClasses = signal<Agenda[]>([]);
+    upcomingLessons = signal<any[]>([]);
     allUsers = signal<User[]>([]);
     loggedUser = signal<User | null>(null);
 
-    ngOnInit() {
+    ngOnInit () {
         this.loadData();
     }
 
-    async loadData() {
-        const [user, users, allAgenda] = await Promise.all([
-            this.userService.getLoggedUser(),
-            this.userService.list(),
-            this.agendaService.list()
-        ]);
+    async loadData () {
+        const user = await this.userService.getLoggedUser();
+        if (!user) return;
 
         this.loggedUser.set(user);
+        const users = await this.userService.list();
         this.allUsers.set(users);
 
-        if (user) {
-            const myClasses = allAgenda.filter(a => a.members.has(user.id));
-            // Sort by day and hour
-            const dayOrder: any = { 'lunes': 1, 'martes': 2, 'miercoles': 3, 'jueves': 4, 'viernes': 5 };
-            myClasses.sort((a, b) => {
-                if (dayOrder[a.day] !== dayOrder[b.day]) {
-                    return dayOrder[a.day] - dayOrder[b.day];
-                }
-                return a.startHour.localeCompare(b.startHour);
-            });
-            this.enrolledClasses.set(myClasses);
+        const today = new Date();
+        const thirtyDaysLater = new Date();
+        thirtyDaysLater.setDate(today.getDate() + 30);
+
+        const startStr = today.toISOString().split('T')[ 0 ];
+        const endStr = thirtyDaysLater.toISOString().split('T')[ 0 ];
+
+        const [ agendas, lessons ] = await Promise.all([
+            this.agendaService.list(),
+            this.lessonService.listByRange(startStr, endStr)
+        ]);
+
+        const upcoming: any[] = [];
+        for (const lesson of lessons) {
+            if (lesson.status !== 'active') continue;
+
+            const agenda = agendas.find(a => a.id === lesson.agendaId);
+            if (!agenda) continue;
+
+            const members = lesson.members;
+            const isMember = members.has(user.id);
+            const status = lesson.status;
+
+            if (isMember) {
+                upcoming.push({
+                    id: lesson?.id,
+                    agendaId: lesson.agendaId,
+                    date: lesson.date,
+                    displayDate: new Date(lesson.date).toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' }),
+                    name: lesson?.name || 'Clase',
+                    startHour: agenda.startHour,
+                    endHour: agenda.endHour,
+                    status: status,
+                    members: members,
+                    note: lesson?.note || ''
+                });
+            }
         }
+
+        // Sort by date and then hour
+        upcoming.sort((a, b) => {
+            if (a.date !== b.date) return a.date.localeCompare(b.date);
+            return a.startHour.localeCompare(b.startHour);
+        });
+
+        this.upcomingLessons.set(upcoming);
     }
 
-    getMemberData(memberIds: Set<string>): User[] {
+    getMemberData (memberIds: Set<string>): User[] {
         const ids = Array.from(memberIds);
         return this.allUsers().filter(u => ids.includes(u.id));
     }

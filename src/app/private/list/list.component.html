@@ -2,82 +2,43 @@
   <p class="text-2xl font-bold my-3">Tus próximas clases</p>
 </div>
 
-<p-accordion
-  [value]="['0']"
-  multiple="true"
->
-  @for (item of enrolledClasses(); track item.id; let i = $index) {
-  <p-accordion-panel [value]="i.toString()">
-    <p-accordion-header class="p-2">
-        <ng-template
-          #toggleicon
-          let-active="active"
-        >
-          <i [class]="active ? 'pi pi-minus' : 'pi pi-plus'"></i>
-        </ng-template>
-        <div class="flex align-items-center gap-3 w-full pr-3">
-          <p-avatar
-            icon="pi pi-calendar"
-            shape="circle"
-            class="flex-shrink-0"
-            [pt]="{ root: { class: 'bg-primary-100 text-primary' } }"
-          />
-          <div class="flex flex-column text-left">
-            <span class="text-lg font-bold capitalize">{{ item.day }}</span>
-            <span class="text-sm text-600 font-medium">{{ item.startHour }} - {{
-              item.endHour }}</span>
+<div class="flex flex-column gap-3 mx-2">
+  @for (item of upcomingLessons(); track (item.date + item.agendaId)) {
+  <div class="p-3 border-round-xl border-1 surface-border surface-card shadow-1">
+    <div class="flex align-items-center gap-3 mb-3">
+      <p-avatar icon="pi pi-calendar" shape="circle" class="flex-shrink-0"
+        [pt]="{ root: { class: 'bg-primary-100 text-primary' } }" />
+      <div class="flex flex-column">
+        <span class="text-lg font-bold capitalize">{{ item.displayDate }}</span>
+        <span class="text-xs text-500">{{ item.startHour }} - {{ item.endHour }}</span>
           </div>
-          <p-badge
-            [value]="item.members.size.toString()"
-            class="ml-auto"
-            severity="info"
-          />
-        </div>
-        </p-accordion-header>
-        <p-accordion-content>
-        <div class="flex flex-column gap-3">
-          <div>
-            <p class="font-bold text-sm text-600 mb-2 uppercase tracking-wider">Compañeros
-              de clase</p>
-            <p-listbox
-              [options]="getMemberData(item.members)"
-              optionLabel="name"
-              scrollHeight="250px"
-              class="w-full border-none"
-              styleClass="border-none p-0"
-              [listStyle]="{ 'padding': '0' }"
+        <p-badge [value]="item.members.size.toString()" class="ml-auto" severity="info" />
+      </div>
+      @if (item.note) {
+      <div class="mb-3">
+        <p-tag icon="pi pi-exclamation-triangle" severity="warn" [value]="item.note" />
+      </div>
+      }
+
+      <div class="flex flex-wrap gap-2">
+  @for (user of getMemberData(item.members); track user.id) {
+  <div class="flex align-items-center gap-2 px-2 py-1 border-round-lg surface-100 border-1 surface-border">
+    <div
+              class="w-1rem h-1rem border-circle flex align-items-center justify-content-center font-bold text-[8px]"
+              [style]="{ backgroundColor: user.bgColor, color: user.color }"
             >
-              <ng-template let-user pTemplate="item">
-                <div class="flex align-items-center gap-3 py-1">
-                  <div
-                    class="w-2rem h-2rem border-circle flex align-items-center justify-content-center font-bold text-xs"
-                    [style]="{ backgroundColor: user.bgColor, color: user.color }"
-                  >
-                    {{ user.capitalLetter }}
-                  </div>
-                  <div class="flex flex-column">
-                    <span class="font-medium text-sm">{{ user.name }} {{ user.id ===
-                      loggedUser()?.id ? '(Tú)' : '' }}</span>
-                    <span class="text-xs text-500">{{ user.email }}</span>
-                  </div>
-                </div>
-              </ng-template>
-            </p-listbox>
+              {{ user.capitalLetter }}
             </div>
+            <span class="text-xs font-semibold">{{ user.name }} {{ user.id === loggedUser()?.id ? '(Tú)' : '' }}</span>
+            </div>
+        }
         </div>
-        </p-accordion-content>
-        </p-accordion-panel>
+        </div>
   } @empty {
-  <div class="flex flex-column align-items-center gap-3 p-8">
-    <i class="pi pi-calendar-times text-5xl text-300"></i>
-    <span class="text-xl text-center text-600 font-medium">No estás inscrito en
-      ninguna clase todavía.</span>
-    <p-button
-      label="Ver Calendario"
-      [routerLink]="['/calendar']"
-      severity="help"
-      size="small"
-    />
-  </div>
+    <div class="flex flex-column align-items-center gap-3 p-8">
+      <i class="pi pi-calendar-times text-5xl text-300"></i>
+      <span class="text-xl text-center text-600 font-medium">No hay clases activas próximas.</span>
+      <p-button label="Ver Calendario" [routerLink]="['/calendar']" severity="help" size="small" />
+      </div>
   }
-</p-accordion>
+</div>
