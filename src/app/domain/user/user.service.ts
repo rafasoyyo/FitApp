@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { Auth, authState, signOut } from '@angular/fire/auth';
+import { Auth, authState, signOut, updatePassword, EmailAuthProvider, reauthenticateWithCredential } from '@angular/fire/auth';
 import { BehaviorSubject, firstValueFrom, Observable, of } from 'rxjs';
 import { filter, map, switchMap, tap } from 'rxjs/operators';
 import { CrudService } from '../crud.service';
@@ -41,6 +41,25 @@ export class UserService extends CrudService<User> {
 
   async logout (): Promise<void> {
     await signOut(this.auth);
+  }
+
+  async changePassword (newPassword: string): Promise<void> {
+    const user = this.auth.currentUser;
+    if (user) {
+      await updatePassword(user, newPassword);
+    } else {
+      throw new Error('No user logged in');
+    }
+  }
+
+  async reauthenticate (password: string): Promise<void> {
+    const user = this.auth.currentUser;
+    if (user && user.email) {
+      const credential = EmailAuthProvider.credential(user.email, password);
+      await reauthenticateWithCredential(user, credential);
+    } else {
+      throw new Error('No user logged in or email missing');
+    }
   }
 
   protected override fromJson(json: any): User {
