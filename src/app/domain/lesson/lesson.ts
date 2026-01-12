@@ -1,12 +1,11 @@
 
 type lessonType = {
   id: string;
-  absents: Set<string>;
   agendaId: string;
-  assistant: Set<string>;
+  assistants: string[];
   date: string;
   color: string;
-  guest: Set<string>;
+  members: string[];
   name: string;
   note: string;
   status: 'planned' | 'canceled' | 'active' | 'finished';
@@ -15,11 +14,10 @@ type lessonType = {
 export class Lesson {
   private constructor(
     private _id: string,
-    private _absents: Set<string>,
     private _agendaId: string,
-    private _assistant: Set<string>,
+    private _assistants: Set<string>,
     private _date: string,
-    private _guest: Set<string>,
+    private _members: Set<string>,
     private _name: string,
     private _note: string,
     private _status: 'planned' | 'canceled' | 'active' | 'finished'
@@ -39,16 +37,12 @@ export class Lesson {
     return this._id;
   }
 
-  get absents(): Set<string> {
-    return this._absents;
-  }
-
   get agendaId(): string {
     return this._agendaId;
   }
 
-  get assistant(): Set<string> {
-    return this._assistant;
+  get assistants (): Set<string> {
+    return this._assistants;
   }
 
   get date(): string {
@@ -63,8 +57,8 @@ export class Lesson {
     return Lesson.statusColor(this._status);
   }
 
-  get guest(): Set<string> {
-    return this._guest;
+  get members (): Set<string> {
+    return this._members;
   }
 
   get name(): string {
@@ -82,11 +76,10 @@ export class Lesson {
   static fromJson(json: lessonType): Lesson {
     return new Lesson(
       json.id,
-      new Set(json.absents),
       json.agendaId,
-      new Set(json.assistant),
+      new Set(json.assistants),
       json.date,
-      new Set(json.guest),
+      new Set(json.members),
       json.name,
       json.note,
       json.status
@@ -96,11 +89,10 @@ export class Lesson {
   toJson(): any {
     return {
       id: this.id,
-      absents: Array.from(this.absents),
       agendaId: this.agendaId,
-      assistant: Array.from(this.assistant),
+      assistants: Array.from(this.assistants),
       date: this.date,
-      guest: Array.from(this.guest),
+      members: Array.from(this.members),
       name: this.name,
       note: this.note,
       status: this.status

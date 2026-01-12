@@ -6,7 +6,6 @@ import { CalendarOptions } from '@fullcalendar/core';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
 
-import { MenuItem } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { CheckboxModule } from 'primeng/checkbox';
 import { DialogModule } from 'primeng/dialog';
@@ -68,7 +67,7 @@ export class Calendar implements OnInit {
   constructor(
     private agendaService: AgendaService,
     private userService: UserService,
-    private lessonService: LessonService
+    private lessonService: LessonService,
   ) { }
 
   ngOnInit(): void {
@@ -176,10 +175,12 @@ export class Calendar implements OnInit {
       name: lesson?.name || 'Clase',
       startHour: agenda.startHour,
       endHour: agenda.endHour,
-      members: agenda.members
+      agendaMembers: agenda.members,
+      members: lesson?.members || agenda.members
     };
 
     this.selectedClass.set([displayItem]);
+    this.selectedMembers.set(this.getMembers(lesson?.assistants || []));
     this.visibleDialog.set(true);
   }
 
@@ -190,43 +191,14 @@ export class Calendar implements OnInit {
     return 'Planeada';
   }
 
-  getStatusIcon(status: string) {
-    if (status === 'active') return 'pi pi-check';
-    if (status === 'canceled') return 'pi pi-times';
-    return 'pi pi-clock';
-  }
-
   onMembersChange(event: any) {
     this.selectedMembers.set(event.value);
-  }
-
-  getStatusMenuItems(item: any): MenuItem[] {
-    return [
-      {
-        label: 'Activar',
-        icon: 'pi pi-check',
-        visible: item.status !== 'active',
-        command: () => item.status = 'active'
-      },
-      {
-        label: 'Planear',
-        icon: 'pi pi-clock',
-        visible: item.status !== 'planned',
-        command: () => item.status = 'planned'
-      },
-      {
-        label: 'Cancelar',
-        icon: 'pi pi-times',
-        visible: item.status !== 'canceled',
-        command: () => item.status = 'canceled'
-      }
-    ];
   }
 
   async updateLessonStatus() {
     const membersIds = this.selectedMembers().map(u => u.id);
     const input = this.selectedClass()[0];
-    const lesson = Lesson.fromJson({ ...input, members: new Set(membersIds) });
+    const lesson = Lesson.fromJson({ ...input, assistants: membersIds });
     if (!lesson) return;
     try {
       input.id
