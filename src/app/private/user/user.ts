@@ -36,13 +36,17 @@ export class User implements OnInit {
   constructor(
     private userService: UserService,
     private router: Router
-  ) {
-    this.isDarkMode = document.querySelector('html')?.classList.contains('my-app-dark') ?? false;
-  }
+  ) { }
 
   ngOnInit(): void {
     this.userService.getLoggedUser()
-      .then(user => this.loggedUser.set(user as UserDomain));
+      .then(user => {
+        if (user) {
+          this.loggedUser.set(user as UserDomain);
+          // Set toggle switch based on user preference
+          this.isDarkMode = user.darkMode || false;
+        }
+      });
   }
 
   async saveProfile() {

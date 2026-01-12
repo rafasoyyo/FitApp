@@ -4,6 +4,7 @@ import { Router, RouterLink, RouterOutlet } from '@angular/router';
 
 import { DialogModule } from 'primeng/dialog';
 import { TabsModule } from 'primeng/tabs';
+import { UserService } from '../../domain/user/user.service';
 
 @Component({
   selector: 'app-layout',
@@ -16,9 +17,13 @@ export class Layout implements OnInit {
   showAbout = signal(false);
   version = signal('1.0.0');
 
-  constructor(public router: Router) { }
+  constructor (public router: Router, private userService: UserService) { }
 
   ngOnInit(): void {
+    this.userService.currentUser$.subscribe(user => {
+      document.querySelector('html')?.classList.toggle('my-app-dark', user?.darkMode ?? false);
+    });
+
     fetch('https://fitcenter.web.app/ngsw.json')
       .then(res => res.json())
       .then(data => {

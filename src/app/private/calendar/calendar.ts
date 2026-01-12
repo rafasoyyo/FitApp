@@ -226,7 +226,7 @@ export class Calendar implements OnInit {
   async updateLessonStatus() {
     const membersIds = this.selectedMembers().map(u => u.id);
     const input = this.selectedClass()[0];
-    const lesson = Lesson.fromJson({ ...input, guest: new Set(membersIds) });
+    const lesson = Lesson.fromJson({ ...input, members: new Set(membersIds) });
     if (!lesson) return;
     try {
       input.id

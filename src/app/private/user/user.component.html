@@ -45,12 +45,11 @@
             id="phone"
             name="phone"
             [(ngModel)]="loggedUser().phone"
-            required
             pattern="[0-9]{9}"
             class="w-full"
             #phoneModel="ngModel"
           />
-          <label for="phone">Teléfono</label>
+          <label for="phone">Teléfono (opcional)</label>
         </p-floatLabel>
         @if (phoneModel.invalid && (phoneModel.dirty || phoneModel.touched)) {
         <p-message
