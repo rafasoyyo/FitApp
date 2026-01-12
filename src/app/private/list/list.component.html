@@ -13,8 +13,14 @@
         <span class="text-xs text-500">{{ item.startHour }} - {{ item.endHour }}</span>
           </div>
         <p-badge [value]="item.members.size.toString()" class="ml-auto" severity="info" />
-        </div>
-<div class="flex flex-wrap gap-2">
+      </div>
+      @if (item.note) {
+      <div class="mb-3">
+        <p-tag icon="pi pi-exclamation-triangle" severity="warn" [value]="item.note" />
+      </div>
+      }
+
+      <div class="flex flex-wrap gap-2">
   @for (user of getMemberData(item.members); track user.id) {
   <div class="flex align-items-center gap-2 px-2 py-1 border-round-lg surface-100 border-1 surface-border">
     <div

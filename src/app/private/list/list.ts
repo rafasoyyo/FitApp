@@ -6,6 +6,7 @@ import { AvatarModule } from 'primeng/avatar';
 import { BadgeModule } from 'primeng/badge';
 import { ButtonModule } from 'primeng/button';
 import { ListboxModule } from 'primeng/listbox';
+import { TagModule } from 'primeng/tag';
 
 import { RouterLink } from '@angular/router';
 
@@ -25,7 +26,8 @@ import { UserService } from '../../domain/user/user.service';
         AvatarModule,
         BadgeModule,
         ButtonModule,
-        RouterLink
+        RouterLink,
+        TagModule
     ],
     templateUrl: './list.component.html',
     styleUrl: './list.component.css'
@@ -84,7 +86,8 @@ export class List implements OnInit {
                     startHour: agenda.startHour,
                     endHour: agenda.endHour,
                     status: status,
-                    members: members
+                    members: members,
+                    note: lesson?.note || ''
                 });
             }
         }
