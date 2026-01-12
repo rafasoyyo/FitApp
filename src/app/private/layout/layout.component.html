@@ -1,36 +1,37 @@
+@if(user() !== undefined && user() !== null && !user()?.verified){
+<p-dialog [visible]="true" header="Usuario no verificado" [modal]="true" [closable]="false" [draggable]="false"
+  [resizable]="false" [closeOnEscape]="false" [style]="{ width: '22rem' }">
+  <div class="flex flex-column align-items-center gap-4 py-3">
+    <i class="pi pi-lock text-6xl text-red-500"></i>
+    <div class="text-center">
+      <p class="m-0 text-900 font-semibold text-lg">Tu cuenta aún no ha sido verificada.</p>
+      <p class="mt-2 text-600">Posiblemente sea verificada en breve, si no es así contacta con el administrador para
+        activar tu acceso.</p>
+    </div>
+    <p-button severity="danger" styleClass="w-10rem block mx-auto" (click)="logout()">
+      <span>Salir</span>
+      <i class="pi pi-sign-out ml-3"></i>
+    </p-button>
+  </div>
+</p-dialog>
+} @else{
 <p-tabs [value]="router.url">
   <p-tablist [pt]="{ tabList: { class: 'justify-content-around' } }">
-    <p-tab
-      value="/home"
-      [pt]="{ root: { class: 'pl-2 pr-0 text-500' } }"
-      (click)="showAbout.set(true)"
-    >
+    <p-tab value="/home" [pt]="{ root: { class: 'pl-2 pr-0 text-500' } }" (click)="showAbout.set(true)">
       <p class="m-0">FitCenter</p>
     </p-tab>
-    <p-tab
-      value="/calendar"
-      [routerLink]="['/calendar']"
-    >
+    <p-tab value="/calendar" [routerLink]="['/calendar']">
       <i class="pi pi-calendar mr-2"></i>
     </p-tab>
-    <p-tab
-      value="/list"
-      [routerLink]="['/list']"
-    >
+    <p-tab value="/list" [routerLink]="['/list']">
       <i class="pi pi-list mr-2"></i>
     </p-tab>
     @if (user()?.role === 'admin') {
-    <p-tab
-      value="/admin"
-      [routerLink]="['/admin/agenda']"
-    >
+    <p-tab value="/admin" [routerLink]="['/admin/agenda']">
       <i class="pi pi-cog mr-2"></i>
     </p-tab>
     }
-    <p-tab
-      value="/user"
-      [routerLink]="['/user']"
-    >
+    <p-tab value="/user" [routerLink]="['/user']">
       <i class="pi pi-user mr-2"></i>
     </p-tab>
   </p-tablist>
@@ -38,27 +39,12 @@
 
 <router-outlet></router-outlet>
 
-<p-dialog
-  [visible]="showAbout()"
-  (visibleChange)="showAbout.set($event)"
-  [modal]="true"
-  [draggable]="false"
-  [resizable]="false"
-  [dismissableMask]="true"
-  [closable]="true"
-  [closeOnEscape]="true"
-  [style]="{ width: '20rem' }"
-  [pt]="{headerActions: {class: 'hidden'}}"
->
+<p-dialog [visible]="showAbout()" (visibleChange)="showAbout.set($event)" [modal]="true" [draggable]="false"
+  [resizable]="false" [dismissableMask]="true" [closable]="true" [closeOnEscape]="true" [style]="{ width: '20rem' }"
+  [pt]="{headerActions: {class: 'hidden'}}">
   <div class="flex flex-column align-items-center gap-4 py-4">
-    <div
-      class="w-5rem h-5rem border-circle bg-primary-50 flex align-items-center justify-content-center"
-    >
-      <img
-        src="./icons/icon-512x512.png"
-        alt="FitCenter"
-        class="w-full"
-      />
+    <div class="w-5rem h-5rem border-circle bg-primary-50 flex align-items-center justify-content-center">
+      <img src="./icons/icon-512x512.png" alt="FitCenter" class="w-full" />
     </div>
     <div class="text-center">
       <h2 class="m-0 font-bold text-2xl text-900 line-height-1">FitCenter</h2>
@@ -70,3 +56,4 @@
     </div>
   </div>
 </p-dialog>
+}
