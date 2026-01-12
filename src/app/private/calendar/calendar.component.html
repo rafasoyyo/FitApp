@@ -105,8 +105,23 @@
 
   <ng-template pTemplate="footer">
     <div class="flex justify-content-end gap-2">
-      <p-button label="Editar" variant="outlined" severity="warn"
-        (click)="visibleDialog.set(false); visibleEditDialog.set(true)" />
+      @let item = selectedClass()[0];
+      @if (item) {
+      @if (loggedUser()?.role === 'admin') {
+          <p-button label="Editar" variant="outlined" severity="warn"
+            (click)="visibleDialog.set(false); visibleEditDialog.set(true)" />
+        }
+        
+        @if (loggedUser()?.role === 'user' && item.status === 'active') {
+          @if (isUserMember(item.members)) {
+            <p-button label="No asistiré" variant="outlined" severity="danger"
+              (click)="toggleMembership(item)" />
+          } @else {
+            <p-button label="Inscribirse" severity="success"
+              (click)="toggleMembership(item)" />
+          }
+        }
+        }
       <p-button label="Cerrar" variant="outlined" severity="secondary" (click)="visibleDialog.set(false)" />
     </div>
   </ng-template>

@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, signal, ViewChild } from '@angular/core';
+import { Component, OnInit, signal, ViewChild, inject } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { FullCalendarComponent, FullCalendarModule } from '@fullcalendar/angular';
 import { CalendarOptions } from '@fullcalendar/core';
@@ -35,6 +36,7 @@ export class Calendar implements OnInit {
   selectedDate = signal<string>('');
   users = signal<User[]>([]);
   selectedMembers = signal<User[]>([]);
+  loggedUser: any;
 
   calendarOptions: CalendarOptions = {
     initialView: 'dayGridMonth',
@@ -68,7 +70,9 @@ export class Calendar implements OnInit {
     private agendaService: AgendaService,
     private userService: UserService,
     private lessonService: LessonService,
-  ) { }
+  ) {
+    this.loggedUser = toSignal(this.userService.currentUser$);
+  }
 
   ngOnInit(): void {
     this.userService.list().then(users => this.users.set(users));
@@ -209,6 +213,45 @@ export class Calendar implements OnInit {
       this.visibleEditDialog.set(false);
     } catch (error) {
       console.error('Error updating lesson status:', error);
+    }
+  }
+
+  isUserMember (memberIds: Set<string> | string[] | undefined): boolean {
+    const userId = this.loggedUser()?.id;
+    if (!userId || !memberIds) return false;
+    const ids = Array.from(memberIds);
+    return ids.includes(userId);
+  }
+
+  async toggleMembership (item: any) {
+    const user = this.loggedUser();
+    if (!user) return;
+
+    const currentMembers = new Set(Array.from(item.members as Set<string> | string[]));
+
+    if (currentMembers.has(user.id)) {
+      currentMembers.delete(user.id);
+    } else {
+      currentMembers.add(user.id);
+    }
+
+    const lesson = Lesson.fromJson({
+      ...item,
+      members: currentMembers,
+      assistants: Array.from(item.assistants || [])
+    });
+
+    try {
+      item.id
+        ? await this.lessonService.update(item.id, lesson)
+        : await this.lessonService.create(lesson);
+
+      this.calendarComponent.getApi().refetchEvents();
+      // Update local state to reflect change in dialog
+      item.members = currentMembers;
+      this.selectedClass.set([ ...this.selectedClass() ]);
+    } catch (error) {
+      console.error('Error toggling membership:', error);
     }
   }
 }
