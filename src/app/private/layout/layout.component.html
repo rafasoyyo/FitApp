@@ -19,12 +19,14 @@
     >
       <i class="pi pi-list mr-2"></i>
     </p-tab>
+    @if (user()?.role === 'admin') {
     <p-tab
       value="/admin"
       [routerLink]="['/admin/agenda']"
     >
       <i class="pi pi-cog mr-2"></i>
     </p-tab>
+    }
     <p-tab
       value="/user"
       [routerLink]="['/user']"
