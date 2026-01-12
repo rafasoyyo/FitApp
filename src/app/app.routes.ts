@@ -1,4 +1,6 @@
 import { Routes } from '@angular/router';
+import { authGuard } from './domain/user/auth.guard';
+import { userResolver } from './domain/user/user.resolver';
 
 export const routes: Routes = [
     { path: '', redirectTo: 'calendar', pathMatch: 'full' },
@@ -19,6 +21,8 @@ export const routes: Routes = [
     {
         path: '',
         loadComponent: () => import('./private/layout/layout').then(m => m.Layout),
+        canActivate: [ authGuard ],
+        resolve: { user: userResolver },
         children: [
             { path: '', redirectTo: 'calendar', pathMatch: 'full' },
             {

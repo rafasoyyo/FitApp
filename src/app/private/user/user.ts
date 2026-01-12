@@ -61,7 +61,8 @@ export class User implements OnInit {
     }
   }
 
-  logout() {
+  async logout () {
+    await this.userService.logout();
     this.router.navigate(['/login']);
   }
 
