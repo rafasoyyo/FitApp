@@ -64,6 +64,18 @@ export class User {
     return (this.name || 'A').charAt(0).toUpperCase();
   }
 
+  set name(name: string) {
+    this._name = name;
+  }
+
+  set phone(phone: string) {
+    this._phone = phone;
+  }
+
+  set darkMode(darkMode: boolean) {
+    this._darkMode = darkMode;
+  }
+
   static fromJson(json: UserType): User {
     const colorIndex = (json.name || 'a').toLocaleLowerCase().charCodeAt(0) - 97;
     const bgColor = colorCombinations[colorIndex][0];

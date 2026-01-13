@@ -1,7 +1,7 @@
-import { Injectable, inject } from '@angular/core';
-import { Auth, authState, signOut, updatePassword, EmailAuthProvider, reauthenticateWithCredential } from '@angular/fire/auth';
-import { BehaviorSubject, firstValueFrom, Observable, of } from 'rxjs';
-import { filter, map, switchMap, tap } from 'rxjs/operators';
+import { inject, Injectable } from '@angular/core';
+import { Auth, authState, EmailAuthProvider, reauthenticateWithCredential, signOut, updatePassword } from '@angular/fire/auth';
+import { BehaviorSubject, firstValueFrom, of } from 'rxjs';
+import { switchMap } from 'rxjs/operators';
 import { CrudService } from '../crud.service';
 import { User } from './user';
 
