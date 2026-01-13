@@ -46,7 +46,7 @@ export class AdminUsers implements OnInit {
   getUserList(): Promise<User[]> {
     return this.userService.list()
       .then(users => {
-        this.users.set(users);
+        this.users.set(users.sort((a, b) => a.name.localeCompare(b.name)));
         return users;
       });
   }
