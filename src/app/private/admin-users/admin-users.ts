@@ -30,6 +30,7 @@ import { UserService } from '../../domain/user/user.service';
 export class AdminUsers implements OnInit {
 
   users = signal<User[]>([]);
+  alumnos = signal<User[]>([]);
   agendas = signal<Agenda[]>([]);
 
   constructor(
@@ -46,6 +47,7 @@ export class AdminUsers implements OnInit {
   getUserList(): Promise<User[]> {
     return this.userService.list()
       .then(users => {
+        this.alumnos.set(users.filter(user => user.role === 'user'));
         this.users.set(users.sort((a, b) => a.name.localeCompare(b.name)));
         return users;
       });
