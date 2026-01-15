@@ -63,6 +63,14 @@
                   size="small"
                   (click)="openManageMembers(item); $event.stopPropagation()"
                 />
+                <p-button
+                  icon="pi pi-pencil"
+                  [rounded]="true"
+                  variant="outlined"
+                  severity="success"
+                  size="small"
+                  (click)="openNew(item); $event.stopPropagation()"
+                />
 
                 <p-button
                   icon="pi pi-trash"
@@ -168,7 +176,7 @@
     [visible]="showAddDialog()"
     (visibleChange)="showAddDialog.set($event)"
     [modal]="true"
-    [header]="'Nueva Clase'"
+    [header]="newItem._id ? 'Editar Clase' : 'Nueva Clase'"
     [style]="{ width: '90vw', maxWidth: '350px' }"
     [draggable]="false"
     [resizable]="false"
@@ -263,7 +271,7 @@
           (click)="showAddDialog.set(false)"
         />
         <p-button
-          label="Crear"
+          label="Guardar"
           severity="help"
           size="small"
           (click)="saveAgenda()"

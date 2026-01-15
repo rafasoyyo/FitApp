@@ -104,8 +104,8 @@ export class AdminAgenda implements OnInit {
       });
   }
 
-  openNew() {
-    this.newItem = {
+  openNew(item?: Agenda) {
+    this.newItem = item ||{
       day: 'lunes',
       startDay: null,
       endDay: null,
@@ -118,16 +118,11 @@ export class AdminAgenda implements OnInit {
   saveAgenda() {
     if (!this.newItem.startHour || !this.newItem.endHour || !this.newItem.startDay || !this.newItem.endDay) return;
 
-    const data = {
-      day: this.newItem.day,
-      startDay: this.newItem.startDay,
-      endDay: this.newItem.endDay,
-      startHour: this.newItem.startHour,
-      endHour: this.newItem.endHour,
-      members: []
-    } as any;
+    const savePromise = this.newItem._id
+      ? this.agendaService.update(this.newItem._id, this.newItem)
+      : this.agendaService.create(this.newItem);
 
-    this.agendaService.create(data).then(() => {
+    Promise.all([savePromise]).then(() => {
       this.showAddDialog.set(false);
       this.getAgendaList();
     });
