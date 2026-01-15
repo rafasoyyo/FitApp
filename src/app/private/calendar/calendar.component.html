@@ -100,7 +100,7 @@
             [style.backgroundColor]="user.bgColor" [style.color]="user.color">
             {{ user.capitalLetter }}
           </div>
-          <span class="text-xs font-semibold">{{ user.name }}</span>
+          <span class="text-xs font-semibold">{{ user.name }} {{ user.id === loggedUser()?.id ? '(Tú)' : '' }}</span>
         </div>
         } @empty {
         <span class="text-xs text-400 italic">No hay alumnos inscritos</span>
@@ -258,7 +258,7 @@
                 {{ user.capitalLetter }}
               </div>
               <div class="flex flex-column">
-                <span class="font-medium text-sm">{{ user.name }}</span>
+                <span class="font-medium text-sm">{{ user.name }} {{ user.id === loggedUser()?.id ? '(Tú)' : '' }}</span>
                 <span class="text-xs text-500">{{ user.email }}</span>
               </div>
             </div>

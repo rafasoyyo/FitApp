@@ -6,7 +6,7 @@ type UserType = {
   email: string;
   name: string;
   phone: string;
-  role: string;
+  role: 'admin' | 'user';
   verified: boolean;
 }
 
@@ -56,12 +56,28 @@ export class User {
     return this._role;
   }
 
+  get type (): 'Profesor' | 'Alumno' {
+    return this._role === 'admin' ? 'Profesor' : 'Alumno';
+  }
+
   get verified(): boolean {
     return this._verified;
   }
 
   get capitalLetter(): string {
     return (this.name || 'A').charAt(0).toUpperCase();
+  }
+
+  set name(name: string) {
+    this._name = name;
+  }
+
+  set phone(phone: string) {
+    this._phone = phone;
+  }
+
+  set darkMode(darkMode: boolean) {
+    this._darkMode = darkMode;
   }
 
   static fromJson(json: UserType): User {

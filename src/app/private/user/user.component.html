@@ -1,16 +1,17 @@
+<p-toast></p-toast>
 <div class="flex flex-column gap-6 mt-6 px-4 md:px-8 max-w-30rem mx-auto">
 
   <div class="flex flex-column align-items-center gap-2">
     <p class="text-3xl font-bold m-0">Mi Perfil</p>
     <p class="text-500 m-0">Gestiona tu información personal</p>
     </div>
-    
+
     <form
       #profileForm="ngForm"
       (ngSubmit)="saveProfile()"
       class="flex flex-column gap-5"
     >
-    
+
       <!-- Name Field -->
       <div class="flex flex-column gap-2">
         <p-floatLabel variant="on">
@@ -36,7 +37,7 @@
         </p-message>
         }
       </div>
-    
+
       <!-- Phone Field -->
       <div class="flex flex-column gap-2">
         <p-floatLabel variant="on">
@@ -61,7 +62,7 @@
         </p-message>
         }
       </div>
-    
+
       <!-- Email Field (Readonly) -->
       <div class="flex flex-column gap-2">
         <p-floatLabel variant="on">
@@ -82,7 +83,7 @@
     <div class="flex flex-row justify-content-between gap-2 px-4">
       <span class="font-medium text-500">Modo Oscuro</span>
       <p-toggleSwitch
-        [(ngModel)]="isDarkMode"
+        [(ngModel)]="loggedUser().darkMode"
         (onChange)="toggleDarkMode()"
         [ngModelOptions]="{standalone: true}"
       />

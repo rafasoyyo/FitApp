@@ -1,36 +1,20 @@
-<div
-  id="user-management-container"
-  class=""
->
+<div id="user-management-container" class="">
   <div
-    class="header-section flex flex-column md:flex-row justify-content-between align-items-start md:align-items-center m-3"
-  >
+    class="header-section m-3">
     <h1 class="text-3xl md:text-4xl font-bold m-0 text-900">Gestión de
-      Usuarios</h1>
+      Usuarios <small>| {{alumnos().length}} Alumnos</small></h1>
     <p class="text-600 m-0 mt-2">Administra los usuarios de la plataforma y su
       estado de verificación.</p>
   </div>
 
-  <p-listbox
-    [options]="users()"
-    dataKey="id"
-    optionLabel="name"
-    [filter]="true"
-    filterBy="name,email"
-    [style]="{ width: '100%' }"
-    [listStyle]="{ 'max-height': 'calc(100vh - 350px)' }"
-    styleClass="border-none"
-  >
-    <ng-template
-      pTemplate="item"
-      let-user
-    >
+  <p-listbox [options]="users()" dataKey="id" optionLabel="name" [filter]="true" filterBy="name,email"
+    [style]="{ width: '100%' }" [listStyle]="{ 'max-height': 'calc(100vh - 350px)' }" styleClass="border-none">
+    <ng-template pTemplate="item" let-user>
       <p-card [pt]="{ root: { class: 'w-full' }, body: { class: 'p-3' } }">
         <div class="flex align-items-center gap-4 w-full">
           <div
             class="w-3rem h-3rem border-circle flex align-items-center justify-content-center font-bold flex-shrink-0 text-xl"
-            [style]="{backgroundColor: user.bgColor, color: user.color}"
-          >
+            [style]="{backgroundColor: user.bgColor, color: user.color}">
             {{ user.capitalLetter }}
           </div>
           <!-- User Avatar & Info -->
@@ -42,12 +26,8 @@
 
               <div class="flex align-items-center gap-2">
                 <span class="text-sm text-500">Verificado:</span>
-                <p-toggleSwitch
-                  [ngModel]="user.verified"
-                  (onChange)="toggleVerified(user, $event.checked)"
-                  (click)="$event.stopPropagation()"
-                  styleClass="custom-switch"
-                />
+                <p-toggleSwitch [ngModel]="user.verified" (onChange)="toggleVerified(user, $event.checked)"
+                  (click)="$event.stopPropagation()" styleClass="custom-switch" />
               </div>
             </div>
 
@@ -56,33 +36,39 @@
                 <i class="pi pi-envelope text-xs"></i>
                 {{ user.email }}
               </span>
-              <span class="flex align-items-center gap-1">
-                <i class="pi pi-phone text-xs"></i>
-                {{ user.phone }}
-              </span>
+              <div class="flex gap-2">
+                @if(user.phone){
+                <span class="flex align-items-center gap-1">
+                  <i class="pi pi-phone text-xs"></i>
+                  {{ user.phone }}
+                </span>
+                }
+                <span class="flex align-items-center gap-1">
+                  <i class="pi pi-user text-xs"></i>
+                  {{ user.type }}
+                </span>
+                </div>
             </div>
-<!-- User Agendas Tags -->
-<div class="flex flex-wrap gap-1 mt-2">
-  @for (agenda of getUserAgendas(user.id); track agenda.id) {
-  <span
-    class="px-2 py-1 bg-purple-50 text-purple-700 border-round text-xs font-medium capitalize"
-  >
-    {{ agenda.day }} {{ agenda.startHour }}
-  </span>
-  } @empty {
-  <span class="text-xs text-400 italic">Sin clases asignadas</span>
-  }
-</div>
-          </div>
-          </div>
-      </p-card>
-            </ng-template>
-            <ng-template pTemplate="empty">
-              <div class="flex flex-column align-items-center gap-3 p-8">
-                <i class="pi pi-users text-5xl text-300"></i>
-                <span class="text-xl text-600 font-medium">No se encontraron
-                  usuarios.</span>
+            <!-- User Agendas Tags -->
+            <div class="flex flex-wrap gap-1 mt-2">
+              @for (agenda of getUserAgendas(user.id); track agenda.id) {
+              <span class="px-2 py-1 bg-purple-50 text-purple-700 border-round text-xs font-medium capitalize">
+                {{ agenda.day }} {{ agenda.startHour }}
+              </span>
+              } @empty {
+              <span class="text-xs text-400 italic">Sin clases asignadas</span>
+              }
               </div>
-            </ng-template>
-            </p-listbox>
+          </div>
+        </div>
+      </p-card>
+    </ng-template>
+    <ng-template pTemplate="empty">
+      <div class="flex flex-column align-items-center gap-3 p-8">
+        <i class="pi pi-users text-5xl text-300"></i>
+        <span class="text-xl text-600 font-medium">No se encontraron
+          usuarios.</span>
+      </div>
+    </ng-template>
+    </p-listbox>
 </div>

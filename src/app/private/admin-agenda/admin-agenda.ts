@@ -83,7 +83,7 @@ export class AdminAgenda implements OnInit {
 
   getUserList() {
     this.userService.list().then(users => {
-      this.users.set(users);
+      this.users.set(users.sort((a, b) => a.name.localeCompare(b.name)));
     });
   }
 
