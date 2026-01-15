@@ -2,8 +2,31 @@ rules_version='2'
 
 service cloud.firestore {
   match /databases/{database}/documents {
-    match /{document=**} {
-      allow read, write: if true;
+    
+    // Helper function to check if user is signed in
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    // Helper function to check if user is the owner of the document
+    function isOwner(userId) {
+      return request.auth.uid == userId;
+    }
+
+    // Rules for 'users' collection
+    match /users/{userId} {
+      allow read: if isSignedIn();
+      allow write: if isSignedIn() && isOwner(userId);
+    }
+
+    // Rules for 'lessons' collection
+    match /lessons/{document=**} {
+      allow read, write: if isSignedIn();
+    }
+
+    // Rules for 'agendas' collection
+    match /agendas/{document=**} {
+      allow read, write: if isSignedIn();
     }
   }
 }
