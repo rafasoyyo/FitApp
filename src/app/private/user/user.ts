@@ -3,12 +3,14 @@ import { Component, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 
+import { MessageService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
 import { FloatLabelModule } from 'primeng/floatlabel';
 import { InputTextModule } from 'primeng/inputtext';
 import { MessageModule } from 'primeng/message';
 import { PasswordModule } from 'primeng/password';
+import { ToastModule } from 'primeng/toast';
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
 
 import { User as UserDomain } from '../../domain/user/user';
@@ -26,8 +28,10 @@ import { UserService } from '../../domain/user/user.service';
     FloatLabelModule,
     MessageModule,
     DialogModule,
-    PasswordModule
+    PasswordModule,
+    ToastModule
   ],
+  providers: [MessageService],
   templateUrl: './user.component.html',
   styleUrl: './user.component.css'
 })
@@ -45,7 +49,8 @@ export class User implements OnInit {
 
   constructor(
     private userService: UserService,
-    private router: Router
+    private router: Router,
+    private messageService: MessageService
   ) { }
 
   ngOnInit(): void {
@@ -65,9 +70,10 @@ export class User implements OnInit {
         phone: this.loggedUser().phone,
         darkMode: this.loggedUser().darkMode
       });
-      // Optional: show some success toast if you have it
+      this.messageService.add({ severity: 'success', summary: 'Éxito', detail: 'Perfil actualizado correctamente' });
     } catch (error) {
       console.error('Error updating profile:', error);
+      this.messageService.add({ severity: 'error', summary: 'Error', detail: 'No se pudo actualizar el perfil' });
     } finally {
       this.loading.set(false);
     }
