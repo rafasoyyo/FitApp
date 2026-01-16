@@ -85,6 +85,7 @@
       <span class="text-lg font-bold uppercase">
         <i class="pi pi-users"></i>
         {{ item.members.size }}
+        <small class="text-sm">/ 12</small>
         Alumnos
         Inscritos
       </span>
@@ -110,8 +111,18 @@
     @if (loggedUser()?.role === 'user') {
     @if (item.status !== 'active') {
     <div
-      class="flex align-items-center gap-2 p-2 border-round bg-yellow-50 text-yellow-900 text-xs border-1 border-yellow-100">
-      <i class="pi pi-exclamation-triangle"></i>
+      class="flex align-items-center gap-2 p-2 border-round text-xs border-1" [ngClass]="{
+        'bg-yellow-50 text-yellow-900 border-yellow-100': item.status === 'planned',
+        'bg-red-50 text-red-900 border-red-100': item.status === 'canceled',
+        'bg-gray-50 text-gray-900 border-gray-100': item.status === 'finished',
+        'bg-green-50 text-green-900 border-green-100': item.status === 'active'
+      }">
+      <i class="pi" [ngClass]="{
+        'pi-exclamation-triangle': item.status === 'planned',
+        'pi-times-circle': item.status === 'canceled',
+        'pi-clock': item.status === 'finished',
+        'pi-check-circle': item.status === 'active'
+      }"></i>
       <span>
         @switch (item.status) {
         @case ('planned') { La inscripción no está permitida porque la clase aún no ha sido activada. }
