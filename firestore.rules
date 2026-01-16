@@ -16,7 +16,7 @@ service cloud.firestore {
     // Rules for 'users' collection
     match /users/{userId} {
       allow read: if isSignedIn();
-      allow write: if isSignedIn() && isOwner(userId);
+      allow write: if isSignedIn();
     }
 
     // Rules for 'lessons' collection
