@@ -1,10 +1,10 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, signal, inject } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { Router, RouterLink, RouterOutlet } from '@angular/router';
 
-import { DialogModule } from 'primeng/dialog';
 import { ButtonModule } from 'primeng/button';
+import { DialogModule } from 'primeng/dialog';
 import { TabsModule } from 'primeng/tabs';
 import { UserService } from '../../domain/user/user.service';
 
@@ -17,6 +17,7 @@ import { UserService } from '../../domain/user/user.service';
 })
 export class Layout implements OnInit {
   private userService = inject(UserService);
+
   showAbout = signal(false);
   version = signal('1.0.0');
   user = toSignal(this.userService.currentUser$);
