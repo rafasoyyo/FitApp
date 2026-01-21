@@ -134,7 +134,7 @@ export class Calendar implements OnInit {
             const lesson = lessons.find(l => l.agendaId === agenda.id && l.date === dateStr);
 
             const expired = currentDate < new Date();
-            const color = expired ? '#b1b1b1ff' : lesson?.color || '#facc15';
+            const color = expired ? Lesson.statusColor('finished') : lesson?.color || Lesson.statusColor('planned');
             events.push({
               id: `${agenda.id}-${dateStr}`,
               title: lesson?.name || 'Clase',
@@ -195,6 +195,10 @@ export class Calendar implements OnInit {
     if (status === 'canceled') return 'Cancelada';
     if (status === 'finished') return 'Finalizada';
     return 'Planeada';
+  }
+
+  getStatusColor (status: 'planned' | 'active' | 'finished' | 'canceled') {
+    return Lesson.statusColor(status);
   }
 
   onMembersChange(event: any) {
