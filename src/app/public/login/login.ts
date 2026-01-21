@@ -62,12 +62,12 @@ export class Login {
     }
   }
 
-  async mockLogin (role: 'user' | 'admin') {
-    const creds = role === 'user'
-      ? { email: 'user@test.com', password: 'password123' }
-      : { email: 'admin@test.com', password: 'password123' };
+  // async mockLogin (role: 'user' | 'admin') {
+  //   const creds = role === 'user'
+  //     ? { email: 'user@test.com', password: 'password123' }
+  //     : { email: 'admin@test.com', password: 'password123' };
 
-    this.loginForm.patchValue(creds);
-    await this.login();
-  }
+  //   this.loginForm.patchValue(creds);
+  //   await this.login();
+  // }
 }
