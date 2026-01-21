@@ -182,7 +182,8 @@ export class Calendar implements OnInit {
       endHour: agenda.endHour,
       note: lesson?.note || '',
       agendaMembers: agenda.members,
-      members: lesson?.members || agenda.members
+      members: lesson?.members || agenda.members,
+      requests: lesson?.requests || []
     };
 
     this.selectedClass.set([displayItem]);
@@ -237,21 +238,44 @@ export class Calendar implements OnInit {
     return ids.includes(userId);
   }
 
+  isUserRequested (requests: any[] | undefined): boolean {
+    const userId = this.loggedUser()?.id;
+    if (!userId || !requests) return false;
+    return requests.some(r => r.memberId === userId);
+  }
+
+  getRequesters (requests: any[]): { user: User, requestDate: string }[] {
+    return requests.map(r => ({
+      user: this.users().find(u => u.id === r.memberId)!,
+      requestDate: r.requestDate
+    })).filter(r => r.user !== undefined);
+  }
+
   async toggleMembership (item: any) {
     const user = this.loggedUser();
     if (!user) return;
 
     const currentMembers = new Set(Array.from(item.members as Set<string> | string[]));
+    let currentRequests = [ ...(item.requests || []) ];
 
     if (currentMembers.has(user.id)) {
       currentMembers.delete(user.id);
     } else {
-      currentMembers.add(user.id);
+      const requestIndex = currentRequests.findIndex(r => r.memberId === user.id);
+      if (requestIndex > -1) {
+        currentRequests.splice(requestIndex, 1);
+      } else {
+        currentRequests.push({
+          memberId: user.id,
+          requestDate: new Date().toISOString()
+        });
+      }
     }
 
     const lesson = Lesson.fromJson({
       ...item,
-      members: currentMembers,
+      members: Array.from(currentMembers),
+      requests: currentRequests,
       assistants: Array.from(item.assistants || [])
     });
 
@@ -261,11 +285,56 @@ export class Calendar implements OnInit {
         : await this.lessonService.create(lesson);
 
       this.calendarComponent.getApi().refetchEvents();
-      // Update local state to reflect change in dialog
       item.members = currentMembers;
+      item.requests = currentRequests;
       this.selectedClass.set([ ...this.selectedClass() ]);
     } catch (error) {
       console.error('Error toggling membership:', error);
+    }
+  }
+
+  async acceptRequest (item: any, requestId: string) {
+    const currentMembers = new Set(Array.from(item.members as Set<string> | string[]));
+    let currentRequests = [ ...(item.requests || []) ];
+
+    currentMembers.add(requestId);
+    currentRequests = currentRequests.filter(r => r.memberId !== requestId);
+
+    const lesson = Lesson.fromJson({
+      ...item,
+      members: Array.from(currentMembers),
+      requests: currentRequests,
+      assistants: Array.from(item.assistants || [])
+    });
+
+    try {
+      await this.lessonService.update(item.id, lesson);
+      this.calendarComponent.getApi().refetchEvents();
+      item.members = currentMembers;
+      item.requests = currentRequests;
+      this.selectedClass.set([ ...this.selectedClass() ]);
+    } catch (error) {
+      console.error('Error accepting request:', error);
+    }
+  }
+
+  async rejectRequest (item: any, requestId: string) {
+    let currentRequests = [ ...(item.requests || []) ];
+    currentRequests = currentRequests.filter(r => r.memberId !== requestId);
+
+    const lesson = Lesson.fromJson({
+      ...item,
+      requests: currentRequests,
+      assistants: Array.from(item.assistants || [])
+    });
+
+    try {
+      await this.lessonService.update(item.id, lesson);
+      this.calendarComponent.getApi().refetchEvents();
+      item.requests = currentRequests;
+      this.selectedClass.set([ ...this.selectedClass() ]);
+    } catch (error) {
+      console.error('Error rejecting request:', error);
     }
   }
 }
