@@ -119,21 +119,25 @@
         </span>
         <div class="flex flex-column gap-2">
           @for (req of getRequesters(item.requests); track req.user.id) {
-          <div class="flex align-items-center justify-content-between p-2 border-round-lg border-1 bg-orange-50 border-orange-100">
+          <div
+            class="flex align-items-center justify-content-between p-2 border-round-lg border-1 bg-orange-50 border-orange-100">
             <div class="flex align-items-center gap-2">
-              <div class="w-1.5rem h-1.5rem border-circle flex align-items-center justify-content-center font-bold text-xs"
+              <div
+                class="w-1.5rem h-1.5rem border-circle flex align-items-center justify-content-center font-bold text-xs"
                 [style.backgroundColor]="req.user.bgColor" [style.color]="req.user.color">
                 {{ req.user.capitalLetter }}
               </div>
               <div class="flex flex-column">
-                <span class="text-xs font-semibold text-orange-900">{{ req.user.name }} {{ req.user.id === loggedUser()?.id ? '(Tú)' : '' }}</span>
+                <span class="text-xs font-semibold text-orange-900">{{ req.user.name }} {{ req.user.id ===
+                  loggedUser()?.id ? '(Tú)' : '' }}</span>
                 <span class="text-800" style="font-size: 0.65rem;">{{ req.requestDate | date:'short' }}</span>
               </div>
             </div>
-            
+
             @if (loggedUser()?.role === 'admin') {
             <div class="flex gap-1">
-              <p-button icon="pi pi-check" [rounded]="true" [text]="true" severity="success" size="small" (click)="acceptRequest(item, req.user.id)" />
+              <p-button icon="pi pi-check" [rounded]="true" [text]="true" severity="success" size="small"
+                (click)="acceptRequest(item, req.user.id)" />
               <!-- <p-button icon="pi pi-times" [rounded]="true" [text]="true" severity="danger" size="small" (click)="rejectRequest(item, req.user.id)" /> -->
             </div>
             }
