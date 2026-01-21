@@ -1,4 +1,9 @@
 
+export type MemberRequest = {
+  memberId: string;
+  requestDate: string;
+}
+
 type lessonType = {
   id: string;
   agendaId: string;
@@ -9,6 +14,7 @@ type lessonType = {
   name: string;
   note: string;
   status: 'planned' | 'canceled' | 'active' | 'finished';
+  requests: MemberRequest[];
 }
 
 export class Lesson {
@@ -20,7 +26,8 @@ export class Lesson {
     private _members: Set<string>,
     private _name: string,
     private _note: string,
-    private _status: 'planned' | 'canceled' | 'active' | 'finished'
+    private _status: 'planned' | 'canceled' | 'active' | 'finished',
+    private _requests: MemberRequest[]
   ) { }
 
   static statusColor(status: 'planned' | 'canceled' | 'active' | 'finished'): string {
@@ -73,6 +80,10 @@ export class Lesson {
     return this.closed ? 'finished' : this._status;
   }
 
+  get requests (): MemberRequest[] {
+    return this._requests || [];
+  }
+
   static fromJson(json: lessonType): Lesson {
     return new Lesson(
       json.id,
@@ -82,7 +93,8 @@ export class Lesson {
       new Set(json.members),
       json.name,
       json.note,
-      json.status
+      json.status,
+      json.requests || []
     );
   }
 
@@ -95,7 +107,8 @@ export class Lesson {
       members: Array.from(this.members),
       name: this.name,
       note: this.note,
-      status: this.status
+      status: this.status,
+      requests: this.requests
     };
   }
 }

@@ -19,8 +19,8 @@
         <div class="w-1rem h-1rem border-round shadow-1" [style.background-color]="getStatusColor('canceled')"></div>
         <span>Cancelada</span>
       </div>
-      </div>
-      </div>
+    </div>
+  </div>
 
   <p-dialog header="Detalles de la Clase" [visible]="visibleDialog()" (visibleChange)="visibleDialog.set($event)"
     [modal]="true" [style]="{ width: '90vw', maxWidth: '400px' }" [draggable]="false" [resizable]="false"
@@ -68,7 +68,7 @@
             {{ item.startHour }} - {{ item.endHour }}
           </span>
         </div>
-        </div>
+      </div>
 
       <!-- Notas -->
       @if (item.note) {
@@ -103,14 +103,49 @@
               {{ user.capitalLetter }}
             </div>
             <span class="text-xs font-semibold">{{ user.name }} {{ user.id === loggedUser()?.id ? '(Tú)' : '' }}</span>
+          </div>
+          } @empty {
+          <span class="text-xs text-400 italic">No hay alumnos inscritos</span>
+          }
+        </div>
+      </div>
+
+      <!-- Solicitudes Pendientes -->
+      @if(getRequesters(item.requests).length) {
+      <div class="flex flex-column gap-2 pt-2">
+        <span class="text-lg font-bold uppercase text-orange-600">
+          <i class="pi pi-clock"></i>
+          Solicitudes Pendientes
+        </span>
+        <div class="flex flex-column gap-2">
+          @for (req of getRequesters(item.requests); track req.user.id) {
+          <div class="flex align-items-center justify-content-between p-2 border-round-lg border-1 bg-orange-50 border-orange-100">
+            <div class="flex align-items-center gap-2">
+              <div class="w-1.5rem h-1.5rem border-circle flex align-items-center justify-content-center font-bold text-xs"
+                [style.backgroundColor]="req.user.bgColor" [style.color]="req.user.color">
+                {{ req.user.capitalLetter }}
+              </div>
+              <div class="flex flex-column">
+                <span class="text-xs font-semibold text-orange-900">{{ req.user.name }} {{ req.user.id === loggedUser()?.id ? '(Tú)' : '' }}</span>
+                <span class="text-800" style="font-size: 0.65rem;">{{ req.requestDate | date:'short' }}</span>
+              </div>
             </div>
-            } @empty {
-            <span class="text-xs text-400 italic">No hay alumnos inscritos</span>
+            
+            @if (loggedUser()?.role === 'admin') {
+            <div class="flex gap-1">
+              <p-button icon="pi pi-check" [rounded]="true" [text]="true" severity="success" size="small" (click)="acceptRequest(item, req.user.id)" />
+              <!-- <p-button icon="pi pi-times" [rounded]="true" [text]="true" severity="danger" size="small" (click)="rejectRequest(item, req.user.id)" /> -->
+            </div>
             }
-            </div>
-            </div>
-            @if (loggedUser()?.role === 'user') {
-            @if (item.status !== 'active') {
+          </div>
+          } @empty {
+          <span class="text-xs text-400 italic">No hay solicitudes pendientes</span>
+          }
+        </div>
+      </div>
+      }
+      @if (loggedUser()?.role === 'user') {
+      @if (item.status !== 'active') {
       <div class="flex align-items-center gap-2 p-2 border-round text-xs border-1" [ngClass]="{
         'bg-yellow-50 text-yellow-900 border-yellow-100': item.status === 'planned',
         'bg-red-50 text-red-900 border-red-100': item.status === 'canceled',
@@ -130,15 +165,16 @@
           @case ('finished') { La inscripción no está permitida porque la clase ya ha finalizado. }
           }
         </span>
-        </div>
-        } @else if (!canChangeMembership(item)) {
-        <div
-          class="flex align-items-center gap-2 p-2 border-round bg-orange-50 text-orange-900 text-xs border-1 border-orange-100">
-          <i class="pi pi-clock"></i>
-          <span>No se permiten cambios en la inscripción (faltan menos de 24 horas para el inicio).</span>
-        </div>
-        } @else if (item.members.size >= 12 && !isUserMember(item.members)) {
-      <div class="flex align-items-center gap-2 p-2 border-round bg-blue-50 text-blue-900 text-xs border-1 border-blue-100">
+      </div>
+      } @else if (!canChangeMembership(item)) {
+      <div
+        class="flex align-items-center gap-2 p-2 border-round bg-orange-50 text-orange-900 text-xs border-1 border-orange-100">
+        <i class="pi pi-clock"></i>
+        <span>No se permiten cambios en la inscripción (faltan menos de 24 horas para el inicio).</span>
+      </div>
+      } @else if (item.members.size >= 12 && !isUserMember(item.members)) {
+      <div
+        class="flex align-items-center gap-2 p-2 border-round bg-blue-50 text-blue-900 text-xs border-1 border-blue-100">
         <i class="pi pi-info-circle"></i>
         <span>La clase está completa (máximo 12 alumnos). No se permiten más inscripciones en este momento.</span>
       </div>
@@ -165,6 +201,8 @@
         @if (item.status === 'active' && canChangeMembership(item)) {
         @if (isUserMember(item.members)) {
         <p-button label="No asistiré" variant="outlined" severity="danger" (click)="toggleMembership(item)" />
+        } @else if (isUserRequested(item.requests)) {
+        <p-button label="Cancelar solicitud" variant="outlined" severity="warn" (click)="toggleMembership(item)" />
         } @else if (item.members.size
         < 12) { <p-button label="Inscribirse" severity="success" (click)="toggleMembership(item)" />
         }
@@ -172,9 +210,9 @@
         }
         }
         <p-button label="Cerrar" variant="outlined" severity="secondary" (click)="visibleDialog.set(false)" />
-        </div>
-        </ng-template>
-        </p-dialog>
+      </div>
+    </ng-template>
+  </p-dialog>
 
 
   <p-dialog header="Datos de la clase" [visible]="visibleEditDialog()" (visibleChange)="visibleEditDialog.set($event)"
@@ -223,7 +261,7 @@
             {{ item.startHour }} - {{ item.endHour }}
           </span>
         </div>
-        </div>
+      </div>
 
       <!-- Botones de Estado -->
       <div class="flex flex-column gap-2 mb-3">
@@ -258,13 +296,14 @@
         </span>
         <div class="flex flex-wrap gap-2">
 
-          <p-listbox [options]="getMembers(item.members)" [ngModel]="selectedMembers()" [checkbox]="true" [multiple]="true"
-            [showToggleAll]="false" (onChange)="onMembersChange($event)" optionLabel="name" scrollHeight="250px"
-            class="w-full border-none p-0" [listStyle]="{ 'padding': '0' }">
+          <p-listbox [options]="getMembers(item.members)" [ngModel]="selectedMembers()" [checkbox]="true"
+            [multiple]="true" [showToggleAll]="false" (onChange)="onMembersChange($event)" optionLabel="name"
+            scrollHeight="250px" class="w-full border-none p-0" [listStyle]="{ 'padding': '0' }">
             <ng-template let-user pTemplate="item">
               <div class="flex align-items-center gap-1 -my-1">
 
-                <div class="w-2rem h-2rem border-circle flex align-items-center justify-content-center font-bold text-xs"
+                <div
+                  class="w-2rem h-2rem border-circle flex align-items-center justify-content-center font-bold text-xs"
                   [style]="{ backgroundColor: user.bgColor, color: user.color }">
                   {{ user.capitalLetter }}
                 </div>
@@ -272,19 +311,19 @@
                   <span class="font-medium text-sm">{{ user.name }} {{ user.id === loggedUser()?.id ? '(Tú)' : ''
                     }}</span>
                   <span class="text-xs text-500">{{ user.email }}</span>
-                  </div>
-                  </div>
-                  </ng-template>
-                  </p-listbox>
+                </div>
+              </div>
+            </ng-template>
+          </p-listbox>
 
         </div>
-        </div>
-        } @empty {
-        <div class="text-center p-4 text-600">
-          No hay clases programadas para este día.
-        </div>
-        }
-        </div>
+      </div>
+      } @empty {
+      <div class="text-center p-4 text-600">
+        No hay clases programadas para este día.
+      </div>
+      }
+    </div>
 
     <ng-template pTemplate="footer" [pt]="{ }">
       <div class="flex justify-content-end gap-2">
@@ -292,4 +331,5 @@
         <p-button label="Cerrar" variant="outlined" severity="secondary" (click)="visibleEditDialog.set(false)" />
       </div>
     </ng-template>
-    </p-dialog>
+  </p-dialog>
+</div>
