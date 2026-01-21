@@ -206,7 +206,7 @@ export class Calendar implements OnInit {
     this.selectedMembers.set(event.value);
   }
 
-  canChangeMembership (item: any): boolean {
+  moreThan24Hours (item: any): boolean {
     if (!item.date || !item.startHour) return false;
     const lessonStart = new Date(`${item.date}T${item.startHour}`);
     const now = new Date();
