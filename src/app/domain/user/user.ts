@@ -6,7 +6,7 @@ type UserType = {
   email: string;
   name: string;
   phone: string;
-  role: 'admin' | 'user';
+  role: 'admin' | 'teacher' | 'user';
   verified: boolean;
 }
 
@@ -57,7 +57,7 @@ export class User {
   }
 
   get type (): 'Profesor' | 'Alumno' {
-    return this._role === 'admin' ? 'Profesor' : 'Alumno';
+    return this._role === 'teacher' ? 'Profesor' : 'Alumno';
   }
 
   get verified(): boolean {

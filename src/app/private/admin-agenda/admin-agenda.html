@@ -51,6 +51,12 @@
                 <span class="text-600 text-sm">
                   {{ item.startHour }} - {{ item.endHour }}
                 </span>
+                <div class="flex align-items-center gap-1 mt-1">
+                  <i class="pi pi-user text-xs text-green-600"></i>
+                  <span class="text-green-600 text-xs font-medium">
+                    {{ item.teacherName }}
+                  </span>
+                </div>
               </div>
 
               <div class="flex align-items-center gap-3">
@@ -200,6 +206,37 @@
         />
       </div>
 
+      <!-- Teacher Selection -->
+      <div class="flex flex-column gap-1">
+        <label for="teacher" class="font-bold text-xs text-500">Profesor</label>
+        <p-select
+          id="teacher"
+          [options]="teachers()"
+          [(ngModel)]="newItem.teacher"
+          optionLabel="name"
+          optionValue="id"
+          [filter]="true"
+          placeholder="Selecciona un profesor"
+          class="w-full"
+          size="small"
+        >
+          <ng-template let-teacher pTemplate="item">
+            <div class="flex align-items-center gap-3">
+              <div
+                class="w-2rem h-2rem border-circle flex align-items-center justify-content-center font-bold text-xs"
+                [style]="{backgroundColor: teacher.bgColor, color: teacher.color}"
+              >
+                {{ teacher.capitalLetter }}
+              </div>
+              <div class="flex flex-column">
+                <span class="font-medium text-sm">{{ teacher.name }}</span>
+                <span class="text-xs text-500">{{ teacher.email }}</span>
+              </div>
+            </div>
+          </ng-template>
+        </p-select>
+      </div>
+
       <div class="flex flex-column gap-2">
         <!-- Start Date -->
         <div class="flex flex-column gap-1 flex-1">
@@ -275,7 +312,7 @@
           severity="help"
           size="small"
           (click)="saveAgenda()"
-          [disabled]="!newItem.startHour || !newItem.endHour || !newItem.startDay || !newItem.endDay"
+          [disabled]="!newItem.startHour || !newItem.endHour || !newItem.startDay || !newItem.endDay || !newItem.teacher"
         />
       </div>
     </ng-template>

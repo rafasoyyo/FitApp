@@ -15,6 +15,7 @@ type lessonType = {
   note: string;
   status: 'planned' | 'canceled' | 'active' | 'finished';
   requests: MemberRequest[];
+  teacher: string;
 }
 
 export class Lesson {
@@ -27,7 +28,8 @@ export class Lesson {
     private _name: string,
     private _note: string,
     private _status: 'planned' | 'canceled' | 'active' | 'finished',
-    private _requests: MemberRequest[]
+    private _requests: MemberRequest[],
+    private _teacher: string
   ) { }
 
   static statusColor(status: 'planned' | 'canceled' | 'active' | 'finished'): string {
@@ -84,6 +86,10 @@ export class Lesson {
     return this._requests || [];
   }
 
+  get teacher (): string {
+    return this._teacher;
+  }
+
   static fromJson(json: lessonType): Lesson {
     return new Lesson(
       json.id,
@@ -94,7 +100,8 @@ export class Lesson {
       json.name,
       json.note,
       json.status,
-      json.requests || []
+      json.requests || [],
+      json.teacher
     );
   }
 
@@ -108,7 +115,8 @@ export class Lesson {
       name: this.name,
       note: this.note,
       status: this.status,
-      requests: this.requests
+      requests: this.requests,
+      teacher: this.teacher
     };
   }
 }

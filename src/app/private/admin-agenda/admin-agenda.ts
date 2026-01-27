@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, signal, computed } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
 import { ConfirmationService } from 'primeng/api';
@@ -17,7 +17,7 @@ import { AgendaService } from '../../domain/agenda/agenda.service';
 import { User } from '../../domain/user/user';
 import { UserService } from '../../domain/user/user.service';
 
-type AgendaWithMembers = Agenda & { memberNames: string[] };
+type AgendaWithMembers = Agenda & { memberNames: string[], teacherName: string };
 
 @Component({
   selector: 'app-admin-agenda',
@@ -42,6 +42,7 @@ type AgendaWithMembers = Agenda & { memberNames: string[] };
 export class AdminAgenda implements OnInit {
   agendaItems = signal<AgendaWithMembers[]>([]);
   users = signal<User[]>([]);
+  teachers = computed(() => this.users().filter(u => u.role === 'admin'));
   showAddDialog = signal(false);
   showMembersDialog = signal(false);
   selectedAgendaItem = signal<Agenda | null>(null);
@@ -60,7 +61,8 @@ export class AdminAgenda implements OnInit {
     startDay: null,
     endDay: null,
     startHour: null,
-    endHour: null
+    endHour: null,
+    teacher: null
   };
 
   constructor(
@@ -81,6 +83,11 @@ export class AdminAgenda implements OnInit {
       .map(u => u.name);
   }
 
+  getTeacherName (teacherId: string): string {
+    const teacher = this.users().find(u => u.id === teacherId);
+    return teacher ? teacher.name : 'Sin asignar';
+  }
+
   getUserList() {
     this.userService.list().then(users => {
       this.users.set(users.sort((a, b) => a.name.localeCompare(b.name)));
@@ -98,25 +105,36 @@ export class AdminAgenda implements OnInit {
           }
           return a.startHour.localeCompare(b.startHour);
         }) as AgendaWithMembers[];
-        sortedItems.forEach(item => item.memberNames = this.getMemberNames(item.members));
+        sortedItems.forEach(item => {
+          item.memberNames = this.getMemberNames(item.members);
+          item.teacherName = this.getTeacherName(item.teacher);
+        });
         this.agendaItems.set(sortedItems);
         return sortedItems;
       });
   }
 
   openNew(item?: Agenda) {
-    this.newItem = item ||{
-      day: 'lunes',
-      startDay: null,
-      endDay: null,
-      startHour: null,
-      endHour: null
-    };
+    if (item) {
+      this.newItem = {
+        ...item.toJson(),
+        _id: item.id
+      };
+    } else {
+      this.newItem = {
+        day: 'lunes',
+        startDay: null,
+        endDay: null,
+        startHour: null,
+        endHour: null,
+        teacher: null
+      };
+    }
     this.showAddDialog.set(true);
   }
 
   saveAgenda() {
-    if (!this.newItem.startHour || !this.newItem.endHour || !this.newItem.startDay || !this.newItem.endDay) return;
+    if (!this.newItem.startHour || !this.newItem.endHour || !this.newItem.startDay || !this.newItem.endDay || !this.newItem.teacher) return;
 
     const savePromise = this.newItem._id
       ? this.agendaService.update(this.newItem._id, this.newItem)

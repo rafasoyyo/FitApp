@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, signal, ViewChild, inject } from '@angular/core';
+import { Component, OnInit, signal, ViewChild, inject, computed } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { FullCalendarComponent, FullCalendarModule } from '@fullcalendar/angular';
@@ -11,6 +11,7 @@ import { ButtonModule } from 'primeng/button';
 import { CheckboxModule } from 'primeng/checkbox';
 import { DialogModule } from 'primeng/dialog';
 import { SplitButtonModule } from 'primeng/splitbutton';
+import { SelectModule } from 'primeng/select';
 
 import { ListboxModule } from 'primeng/listbox';
 import { TextareaModule } from 'primeng/textarea';
@@ -23,7 +24,7 @@ import { UserService } from '../../domain/user/user.service';
 @Component({
   selector: 'app-calendar',
   standalone: true,
-  imports: [ CommonModule, FormsModule, FullCalendarModule, DialogModule, ButtonModule, CheckboxModule, ListboxModule, SplitButtonModule, TextareaModule ],
+  imports: [ CommonModule, FormsModule, FullCalendarModule, DialogModule, ButtonModule, CheckboxModule, ListboxModule, SplitButtonModule, TextareaModule, SelectModule ],
   templateUrl: './calendar.component.html',
   styleUrl: './calendar.component.css'
 })
@@ -36,6 +37,7 @@ export class Calendar implements OnInit {
   selectedClass = signal<any[]>([]);
   selectedDate = signal<string>('');
   users = signal<User[]>([]);
+  teachers = computed(() => this.users().filter(u => u.role === 'teacher' || u.role === 'admin'));
   selectedMembers = signal<User[]>([]);
   loggedUser: any;
 
@@ -89,6 +91,11 @@ export class Calendar implements OnInit {
   getMembers(memberIds: Set<string> | string[]): User[] {
     const ids = Array.from(memberIds);
     return this.users().filter(u => ids.includes(u.id));
+  }
+
+  getTeacherName (teacherId: string): string {
+    const teacher = this.users().find(u => u.id === teacherId);
+    return teacher ? teacher.name : 'Sin asignar';
   }
 
   async loadLessonsEvents(info: any, successCallback: any, failureCallback: any): Promise<void> {
@@ -183,7 +190,9 @@ export class Calendar implements OnInit {
       note: lesson?.note || '',
       agendaMembers: agenda.members,
       members: lesson?.members || agenda.members,
-      requests: lesson?.requests || []
+      requests: lesson?.requests || [],
+      teacher: lesson?.teacher || agenda.teacher,
+      teacherName: this.getTeacherName(lesson?.teacher || agenda.teacher)
     };
 
     this.selectedClass.set([displayItem]);

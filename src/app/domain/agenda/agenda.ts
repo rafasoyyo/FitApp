@@ -7,6 +7,7 @@ type agendaType = {
   startHour: string;
   endHour: string;
   members: string[];
+  teacher: string;
 }
 
 export class Agenda {
@@ -18,7 +19,8 @@ export class Agenda {
     private _endDay: string,
     private _startHour: string,
     private _endHour: string,
-    private _members: Set<string>
+    private _members: Set<string>,
+    private _teacher: string
   ) { }
 
   get id(): string { return this._id; }
@@ -47,6 +49,10 @@ export class Agenda {
     return this._members;
   }
 
+  get teacher (): string {
+    return this._teacher;
+  }
+
   static fromJson(json: agendaType): Agenda {
     return new Agenda(
       json.id,
@@ -55,7 +61,8 @@ export class Agenda {
       json.endDay,
       json.startHour,
       json.endHour,
-      new Set(json.members)
+      new Set(json.members),
+      json.teacher
     );
   }
 
@@ -67,7 +74,8 @@ export class Agenda {
       endDay: this.endDay,
       startHour: this.startHour,
       endHour: this.endHour,
-      members: Array.from(this.members)
+      members: Array.from(this.members),
+      teacher: this.teacher
     };
   }
 

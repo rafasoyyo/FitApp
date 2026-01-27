@@ -68,6 +68,16 @@
             {{ item.startHour }} - {{ item.endHour }}
           </span>
         </div>
+        <!-- Profesor -->
+        <div class="flex flex-row gap-2 mt-2">
+          <span class="text-lg font-bold uppercase">
+            <i class="pi pi-user"></i>
+            Profesor:
+          </span>
+          <span class="font-bold">
+            {{ item.teacherName }}
+          </span>
+        </div>
       </div>
 
       <!-- Notas -->
@@ -196,24 +206,24 @@
       <div class="flex justify-content-end gap-2">
         @let item = selectedClass()[0];
         @if (item) {
-          @if (loggedUser()?.role === 'admin') {
-            <p-button label="Editar" variant="outlined" severity="warn"
-              (click)="visibleDialog.set(false); visibleEditDialog.set(true)" />
-            }
+        @if (loggedUser()?.role === 'admin') {
+        <p-button label="Editar" variant="outlined" severity="warn"
+          (click)="visibleDialog.set(false); visibleEditDialog.set(true)" />
+        }
 
-          @if (loggedUser()?.role === 'user') {
-            @if (item.status === 'active' && moreThan24Hours(item)) {
-            @if (isUserMember(item.members)) {
-            <p-button label="No asistiré" variant="outlined" severity="danger" (click)="toggleMembership(item)" />
-              }
-              @else if (isUserRequested(item.requests)) {
-              <p-button label="Cancelar solicitud" variant="outlined" severity="warn" (click)="toggleMembership(item)" />
-              }
-              @else {
-              <p-button label="Inscribirse" severity="success" (click)="toggleMembership(item)" />
-              }
-              }
-              }
+        @if (loggedUser()?.role === 'user') {
+        @if (item.status === 'active' && moreThan24Hours(item)) {
+        @if (isUserMember(item.members)) {
+        <p-button label="No asistiré" variant="outlined" severity="danger" (click)="toggleMembership(item)" />
+        }
+        @else if (isUserRequested(item.requests)) {
+        <p-button label="Cancelar solicitud" variant="outlined" severity="warn" (click)="toggleMembership(item)" />
+        }
+        @else {
+        <p-button label="Inscribirse" severity="success" (click)="toggleMembership(item)" />
+        }
+        }
+        }
         }
         <p-button label="Cerrar" variant="outlined" severity="secondary" (click)="visibleDialog.set(false)" />
       </div>
@@ -267,29 +277,77 @@
             {{ item.startHour }} - {{ item.endHour }}
           </span>
         </div>
-      </div>
-
-      <!-- Botones de Estado -->
-      <div class="flex flex-column gap-2 mb-3">
-        <span class="text-xs font-bold uppercase">Estado de la Sesión</span>
-        <div class="flex flex-row justify-content-between gap-2">
-          <p-button label="Planear" icon="pi pi-clock" [variant]="item.status === 'planned' ? undefined : 'outlined'"
-            severity="warn" size="small" class="flex-1" [disabled]="item.status === 'finished'"
-            (click)="item.status = 'planned'" />
-          <p-button label="Activar" icon="pi pi-check" [variant]="item.status === 'active' ? undefined : 'outlined'"
-            severity="success" size="small" class="flex-1" [disabled]="item.status === 'finished'"
-            (click)="item.status = 'active'" />
-          <p-button label="Anular" icon="pi pi-times" [variant]="item.status === 'canceled' ? undefined : 'outlined'"
-            severity="danger" size="small" class="flex-1" [disabled]="item.status === 'finished'"
-            (click)="item.status = 'canceled'" />
+        <!-- Profesor -->
+        <div class="flex flex-row gap-2 mt-2">
+          <span class="text-lg font-bold uppercase">
+            <i class="pi pi-user"></i>
+            Profesor:
+          </span>
+          <span class="font-bold">
+            {{ item.teacherName }}
+          </span>
         </div>
       </div>
 
-      <!-- Notas de la Sesión -->
-      <div class="flex flex-column gap-2 mb-3">
-        <span class="text-xs font-bold uppercase">Notas de la Sesión</span>
-        <textarea pTextarea [(ngModel)]="item.note" rows="3" class="w-full"
-          placeholder="Añade alguna nota técnica o recordatorio..."></textarea>
+      <!-- Profesor -->
+      <div class="flex flex-column gap-3">
+        <div>
+          <span class="text-xs font-bold uppercase">
+            Cambio de Profesor:
+          </span>
+          <p-select [options]="teachers()" [(ngModel)]="item.teacher" optionLabel="name" optionValue="id"
+            [filter]="true" placeholder="Selecciona un profesor" class="w-full" size="small" appendTo="body">
+            <ng-template let-teacher pTemplate="item">
+              <div class="flex align-items-center gap-3">
+                <div
+                  class="w-2rem h-2rem border-circle flex align-items-center justify-content-center font-bold text-xs"
+                  [style]="{backgroundColor: teacher.bgColor, color: teacher.color}">
+                  {{ teacher.capitalLetter }}
+                </div>
+                <div class="flex flex-column">
+                  <span class="font-medium text-sm">{{ teacher.name }}</span>
+                  <span class="text-xs text-500">{{ teacher.email }}</span>
+                </div>
+              </div>
+            </ng-template>
+            <ng-template let-teacher pTemplate="selectedItem">
+              <div class="flex align-items-center gap-2" *ngIf="teacher">
+                <div
+                  class="w-1.5rem h-1.5rem border-circle flex align-items-center justify-content-center font-bold text-xs"
+                  [style]="{backgroundColor: teacher.bgColor, color: teacher.color}">
+                  {{ teacher.capitalLetter }}
+                </div>
+                <div class="flex flex-column">
+                  <span class="font-medium text-sm">{{ teacher.name }}</span>
+                </div>
+              </div>
+            </ng-template>
+          </p-select>
+        </div>
+
+        <!-- Botones de Estado -->
+        <div>
+          <span class="text-xs font-bold uppercase">Estado de la Sesión</span>
+          <div class="flex flex-row justify-content-between gap-2">
+            <p-button label="Planear" icon="pi pi-clock" [variant]="item.status === 'planned' ? undefined : 'outlined'"
+              severity="warn" size="small" class="flex-1" [disabled]="item.status === 'finished'"
+              (click)="item.status = 'planned'" />
+            <p-button label="Activar" icon="pi pi-check" [variant]="item.status === 'active' ? undefined : 'outlined'"
+              severity="success" size="small" class="flex-1" [disabled]="item.status === 'finished'"
+              (click)="item.status = 'active'" />
+            <p-button label="Anular" icon="pi pi-times" [variant]="item.status === 'canceled' ? undefined : 'outlined'"
+              severity="danger" size="small" class="flex-1" [disabled]="item.status === 'finished'"
+              (click)="item.status = 'canceled'" />
+          </div>
+        </div>
+
+
+        <!-- Notas de la Sesión -->
+        <div>
+          <span class="text-xs font-bold uppercase">Notas de la Sesión</span>
+          <textarea pTextarea [(ngModel)]="item.note" rows="3" class="w-full"
+            placeholder="Añade alguna nota técnica o recordatorio..."></textarea>
+        </div>
       </div>
 
       <!-- Lista de Asistencia -->
